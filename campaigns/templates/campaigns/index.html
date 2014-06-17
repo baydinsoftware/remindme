@@ -1,0 +1,9 @@
+<h1>reminders for days</h1>
+
+<ul>
+{% for campaign in campaign_list %}
+	<li>
+		<a href="{% url 'campaigns:campaign' campaign.slug %}">{{ campaign.name }}</a>
+	</li>
+{% endfor %}
+</ul>

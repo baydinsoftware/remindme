@@ -1,0 +1,14 @@
+
+<br /><br />
+<h1>{{ campaign.name }}</h1>
+
+<br /><br />
+{{ campaign.description }}
+<br /><br />
+omg this is great sign me up!
+<form action="{% url 'campaigns:campaign' campaign.slug %}" method=post>
+{% csrf_token %}
+	Name:<input type='text' name='name'><br />
+	Email:<input type='text' name='email'><br />
+	<input type="submit" Value="Sign up">
+</form>

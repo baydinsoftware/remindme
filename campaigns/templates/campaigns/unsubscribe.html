@@ -1,0 +1,17 @@
+Hey, {{ subscriber.name }}!<br />
+<br />
+Your email address, {{ subscriber.email_address }}, is currently subscribed to:
+<ul>
+{% for subscription in subscriptions %}
+	<li>{{ subscription.subscription }}</li>
+{% endfor %}
+</ul>
+
+Click below to unsubscribe from these reminders.
+<br /><br />
+<form action="" method='post'>{% csrf_token %}
+<input type='submit' value='Unsubscribe' />
+</form>
+
+
+

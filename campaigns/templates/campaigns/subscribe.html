@@ -1,0 +1,102 @@
+<head>
+	<style type='text/css'>
+		body {
+			background: #FCFbF9;
+			font-family: Georgia;
+			font-size: 14px;
+			color: #6C6262;
+			line-height: 24px;
+			margin: 0px;
+			padding: 0px;
+			padding-top: 40px;
+		}
+		#form{
+			border-radius: 4px;
+			background: #FDFCFA;
+			width:440px;
+			-moz-box-shadow: 0px 1px 15px 0px rgba(0,0,0,0.07);
+			box-shadow: 0px 1px 15px 0px rgba(0,0,0,0.07);
+			text-align: center;
+			margin: auto;
+			padding: 30px;
+			margin-top: 20px;
+		 }
+		 
+		input[type=submit] {
+			border-radius: 3px;
+			background: #594360;
+			font-family: Georgia;
+			font-size: 20px;
+			color: #FFFFFF;
+			line-height: 24px;
+			width: 230px;
+			height: 40px;
+			font-weight: bold;
+			font-style:italic;
+			margin-top: 30px;
+		}
+		input[type=text] {
+			border-radius: 0x;
+			background: #FFF;
+			font-family: Georgia;
+			border: 1px solid #DDD;
+		}
+		input[type=email] {
+			border-radius: 0x;
+			background: #FFF;
+			font-family: Georgia;
+			border: 1px solid #DDD;
+		}
+		.errorlist {
+			color: red;
+			list-style-type: none;
+		}
+		p {
+			width: 500px;
+			margin: auto;
+		}
+		#footer
+		{
+		  position: fixed;
+		  bottom: 0;
+		  width: 100%;
+		  background: #594360;
+		  line-height: 34px;
+		  font-size: 10px;
+		  color: #FFF;
+		  text-align: center;
+		  vertical-align: middle;
+		}
+		h1 {
+		  text-align: center;
+		}
+	</style>
+</head>
+
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js">
+</script>
+
+<h1>{{ campaign.name }}</h1>
+<p>
+{{ campaign.description }}
+<br /><br />
+<a href="{% url 'campaigns:emails' campaign.slug %}">View all emails in this campaign</a>
+</p>
+
+
+<div id="form">
+	<form action="" method='post'>{% csrf_token %}
+	{{ form.as_p }}
+	<script>
+		var tz = jstz.determine(); // Determines the time zone of the browser client
+		document.write('<input type="hidden" name="timezone" value="');
+		document.write(tz.name());
+		document.write('">');
+	</script>
+
+	<input type='submit' value='Sign me up!' />
+	</form>
+</div>
+<div id="footer">
+	Brought to you by the makers of Boomerang for Gmail, Boomerang Calendar, Inbox Pause, Boomerang for Android, Boomerang for Outlook and whatever else we make.
+</div>
