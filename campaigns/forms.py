@@ -2,7 +2,7 @@ from django import forms
 from django.forms import ModelForm
 from django.core.exceptions import ValidationError
 from campaigns.models import *
-
+from django.forms.extras.widgets import SelectDateWidget
 
 class RelativeStartForm(ModelForm):
 	confirm_email = forms.EmailField(
@@ -46,6 +46,7 @@ class DeadlineForm(ModelForm):
 			widget=forms.CheckboxSelectMultiple,
 			)
 		self.fields['deadline'].required = True
+		self.fields['deadline'].widget = SelectDateWidget()
 	
 	class Meta:
 		model = Subscriber
@@ -57,6 +58,12 @@ class DeadlineForm(ModelForm):
                     cleaned_data.get('confirm_email')):
                     raise ValidationError("Email addresses must match.")
                 return cleaned_data
+
+
+class MyMultipleModelChoiceField(forms.ModelMultipleChoiceField):
+
+    def label_from_instance(self, obj):
+        return "%s | &s" % (obj.name, obj.field1)
 
 class FixedForm(ModelForm):
 

@@ -1,3 +1,19 @@
+
+
+{% load static  %}
+
+<head>
+	<link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css">
+	<link href="{{ STATIC_URL}}css/{{ campaign.slug }}_colors.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<div id='logo'><a href="{% url 'campaigns:campaign' campaign.slug %}"><img src="{{ STATIC_URL}}images/{{ campaign.slug }}_logo.png" /></a></div>
+<p>
+<center>
 We're sad to see you go, {{ subscriber.name }}
 <br /><br />
-Maybe we'll see you around.
+Maybe we'll see you around.</center></p>
+<div id="footer">
+	Brought to you by the makers of Boomerang for Gmail, Boomerang Calendar, Inbox Pause, Boomerang for Android, Boomerang for Outlook and whatever else we make.
+</div>

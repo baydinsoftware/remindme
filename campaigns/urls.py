@@ -10,7 +10,7 @@ urlpatterns = patterns('',\
 	url(r'^$',views.index, name='index'),
 	url(r'^(?P<campaign_slug>[a-zA-Z0-9_.-]+)/$', views.campaign, name='campaign'),
 	url(r'^(?P<campaign_slug>[a-zA-Z0-9_.-]+)/emails/$', views.emails, name='emails'),
-	url(r'^unsubscribe/(?P<subscriber_id>[0-9]+)/$',views.unsubscribe, name ='unsubscribe'),
+	url(r'^(?P<campaign_slug>[a-zA-Z0-9_.-]+)/unsubscribe/(?P<subscriber_id>[0-9]+)/$',views.unsubscribe, name ='unsubscribe'),
 
 	)
 

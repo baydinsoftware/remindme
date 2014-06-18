@@ -1,18 +1,29 @@
- Here's a list of all the emails that will be sent out with this campaign
-<h1>{{ campaign.name }}</h1>
-{{ campaign.description }}
-<br /><br />
-<a href="{% url 'campaigns:campaign' campaign.slug %}">Subscribe</a>
+{% load static  %}
 
-<br /><br />
+<head>
+	<link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css">
+	<link href="{{ STATIC_URL}}css/{{ campaign.slug }}_colors.css" rel="stylesheet" type="text/css">
+
+</head>
+
+<div id='logo'><a href="{% url 'campaigns:campaign' campaign.slug %}"><img src="{{ STATIC_URL}}images/{{ campaign.slug }}_logo.png" /></a></div>
+
+<p>{{ campaign.description }}</p>
+<p><center>
+<br /><a href="{% url 'campaigns:campaign' campaign.slug %}">Subscribe</a>
+</center></p>
 {% for email in emails %}
-<div style="border:1px solid black;width:70%;padding:20px;">
-	<b>Subject:</b> {{ email.subject }}
+<div class="emails">	
+<b>Subject:</b> {{ email.subject }}
 	<br />
-	<b>Send date:</b> {{ email.send_date }}
+	<b>Send date:</b>
+	 {{ email.send_date }}
 	<br />
 	<hr>
 	{% autoescape off %}{{ email.content }}{% endautoescape %}
 </div>
 <br/ ><br />
 {% endfor %}
+<div id="footer">
+	Brought to you by the makers of Boomerang for Gmail, Boomerang Calendar, Inbox Pause, Boomerang for Android, Boomerang for Outlook and whatever else we make.
+</div>
