@@ -161,7 +161,7 @@ def campaign(request,campaign_slug):
 		    subscriber = Subscriber.objects.create(name=name,
 						email_address=email_address,deadline=deadline_utc)
 		    required_options = DeadlineOption.objects.filter(campaign=campaign,required=True)		    
-		    all_options = list(chain(required_options, options))
+		    all_options = chain(required_options, options)
 		    
 		    first_email = deadline_local #we're going to store the earliest email this subscriber would get to calculate appropriate welcome
 		    for option in all_options:

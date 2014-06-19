@@ -96,11 +96,14 @@ class RelativeStartCampaignAdmin(admin.ModelAdmin):
                 }),
         )
 
-class SubscriptionInline(generic.GenericTabularInline):
+class SubscriptionInline(admin.StackedInline):
 	model = Subscription
-	readonly_fields=('object_id','content_type')
+	readonly_fields=('subscription',)
+	fields=('subscription',)
+	extra = 0
+	def has_add_permission(self, request):
+		return False
 
-	
 class SubscriberAdmin(admin.ModelAdmin):
 	fieldsets = (
                 (None, {
@@ -127,5 +130,4 @@ admin.site.register(DeadlineEmail,DeadlineEmailAdmin)
 admin.site.register(FixedEmail,FixedEmailAdmin)
 admin.site.register(RelativeStartCampaign,RelativeStartCampaignAdmin)
 admin.site.register(Subscriber,SubscriberAdmin)
-admin.site.register(Subscription)
 admin.site.register(EmailQueue,EmailQueueAdmin)
