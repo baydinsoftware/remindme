@@ -119,9 +119,9 @@ class SubscriberAdmin(admin.ModelAdmin):
 
 	
 class EmailQueueAdmin(admin.ModelAdmin):
-      	list_filter = ('email_sent',)
-	readonly_fields = ('email_sent',)	
-
+	list_filter = ('email_sent',)
+	readonly_fields = ('subscription','email_sent','email')	
+	fields=('send_date','subscription','email','email_sent')
 
 admin.site.register(Campaign,CampaignAdmin)
 admin.site.register(FixedCampaign,FixedCampaignAdmin)

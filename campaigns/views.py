@@ -134,99 +134,101 @@ def campaign(request,campaign_slug):
 		'form': form,'campaign':campaign
 		  })
 	elif type == DEADLINE:
-	    if request.method == 'GET':
-		form = DeadlineForm(campaign=campaign)
-	    else:
-		# A POST request: Handle Form Upload
-		form = DeadlineForm(request.POST,campaign=campaign) # Bind data from request.POST into a PostForm
-	
-		# If data is valid, proceeds to create a new post and redirect the user
-		if form.is_valid():
-		  
-		    ###Save Data
-		    name = form.cleaned_data['name']
-		    email_address = form.cleaned_data['email_address']
-		    deadline = form.cleaned_data['deadline']
-		    options = form.cleaned_data['options']
-		    timezone = request.POST['timezone']
-		    
-		    utc_zone = tz.gettz('UTC')
-		    local_zone = tz.gettz(timezone)
-		    
-		    #deadline given is in local
-		    deadline_local = deadline.replace(tzinfo=local_zone)
-		    #convert deadline to UTC to store
-		    deadline_utc= deadline_local.astimezone(utc_zone)
+		if request.method == 'GET':
+			form = DeadlineForm(campaign=campaign)
+			return render(request, 'campaigns/subscribe.html', {
+				'form': form,'campaign':campaign
+			})	    
+		else:
+			# A POST request: Handle Form Upload
+			form = DeadlineForm(request.POST,campaign=campaign) # Bind data from request.POST into a PostForm
 
-		    subscriber = Subscriber.objects.create(name=name,
-						email_address=email_address,deadline=deadline_utc)
-		    required_options = DeadlineOption.objects.filter(campaign=campaign,required=True)		    
-		    all_options = chain(required_options, options)
-		    
-		    first_email = deadline_local #we're going to store the earliest email this subscriber would get to calculate appropriate welcome
-		    for option in all_options:
-			subscription = Subscription.objects.create(subscriber=subscriber,
+			# If data is valid, proceeds to create a new post and redirect the user
+			if form.is_valid():
+
+			###Save Data
+				name = form.cleaned_data['name']
+				email_address = form.cleaned_data['email_address']
+				deadline = form.cleaned_data['deadline']
+				options = form.cleaned_data['options']
+				timezone = request.POST['timezone']
+
+				utc_zone = tz.gettz('UTC')
+				local_zone = tz.gettz(timezone)
+			    
+				#deadline given is in local
+				deadline_local = deadline.replace(tzinfo=local_zone)
+				#convert deadline to UTC to store
+				deadline_utc= deadline_local.astimezone(utc_zone)
+
+				subscriber = Subscriber.objects.create(name=name,
+							email_address=email_address,deadline=deadline_utc)
+				required_options = DeadlineOption.objects.filter(campaign=campaign,required=True)		    
+				all_options = chain(required_options, options)
+
+				first_email = deadline_local #we're going to store the earliest email this subscriber would get to calculate appropriate welcome
+				for option in all_options:
+					subscription = Subscription.objects.create(subscriber=subscriber,
 					subscription=option)
-			
-			#Add Emails for each option to EmailQueue
-			emails = DeadlineEmail.objects.filter(option=option)
-			for email in emails:
-				#date = datetime(2002, 10, 10, 6, 0, 0)
-				send_date_local = deadline_local + timedelta(days=-email.delta_days) + relativedelta(months=-email.delta_months)
-				
-				#get strict value of time email should be sent
-				send_time = email.send_time.replace(tzinfo=None)
-				
-				#add this strict value of time to local send time
-				send_date_local = send_date_local.replace(hour=send_time.hour,minute=send_time.minute,second=send_time.second)
-				
-				#convert calucalted send date back to UTC
-				send_date_utc = send_date_local.astimezone(utc_zone)
 
+					#Add Emails for each option to EmailQueue
+					emails = DeadlineEmail.objects.filter(option=option)
+					for email in emails:
+						#date = datetime(2002, 10, 10, 6, 0, 0)
+						send_date_local = deadline_local + timedelta(days=-email.delta_days) + relativedelta(months=-email.delta_months)
+
+						#get strict value of time email should be sent
+						send_time = email.send_time.replace(tzinfo=None)
+
+						#add this strict value of time to local send time
+						send_date_local = send_date_local.replace(hour=send_time.hour,minute=send_time.minute,second=send_time.second)
+
+						#convert calucalted send date back to UTC
+						send_date_utc = send_date_local.astimezone(utc_zone)
+
+						now_utc = datetime.utcnow().replace(tzinfo=utc_zone)
+
+						#if this intended send time is earlier than current earliest, save
+						if first_email > send_date_utc:
+							first_email = send_date_utc
+						#only add to queue if its send date has yet to happen
+						if send_date_utc > now_utc:
+							queue = EmailQueue.objects.create(send_date=send_date_utc,subscription=subscription,email=email)
+							
+				###Calculate ranges for each Welcome Email
 				now_utc = datetime.utcnow().replace(tzinfo=utc_zone)
+				before_date = now_utc + relativedelta(weeks=-campaign.ontime_margin_in_weeks)
+				after_date = now_utc + relativedelta(weeks=campaign.ontime_margin_in_weeks)
+
+				months_away = 0
+				for r in rrule.rrule(rrule.MONTHLY, bymonthday=(deadline_utc.day, -1), bysetpos=1, dtstart=now_utc, until=deadline_utc):
+					months_away += 1
+
+			    ###Send Appropriate Welcome Email
+				if after_date > first_email and before_date < first_email:
+					subject = campaign.welcome_subject
+					body = campaign.welcome_content
+				elif after_date > first_email:
+					subject = campaign.after_welcome_subject
+					body = campaign.after_welcome_content
+				else:
+					subject = campaign.before_welcome_subject
+					body = campaign.before_welcome_content
 				
-				#if this intended send time is earlier than current earliest, save
-				if first_email > send_date_utc:
-					first_email = send_date_utc
-				#only add to queue if its send date has yet to happen
-				if send_date_utc > now_utc:
-					queue = EmailQueue.objects.create(send_date=send_date_utc,subscription=subscription,email=email)
-						
-		    ###Calculate ranges for each Welcome Email
-		    now_utc = datetime.utcnow().replace(tzinfo=utc_zone)
-		    before_date = now_utc + relativedelta(weeks=-campaign.ontime_margin_in_weeks)
-		    after_date = now_utc + relativedelta(weeks=campaign.ontime_margin_in_weeks)
-		    
-		    months_away = 0
-		    for r in rrule.rrule(rrule.MONTHLY, bymonthday=(deadline_utc.day, -1), bysetpos=1, dtstart=now_utc, until=deadline_utc):
-			months_away += 1
-			
-		    ###Send Appropriate Welcome Email
-			if after_date > first_email and before_date < first_email:
-				subject = campaign.welcome_subject
-				body = campaign.welcome_content
-			elif after_date > first_email:
-				subject = campaign.after_welcome_subject
-				body = campaign.after_welcome_content
-			else:
-				subject = campaign.before_welcome_subject
-				body = campaign.before_welcome_content
-			
-			#Send welcome email email with approrpaite information
-			subject = subject.replace("{{name}}",name)
-			body = body.replace("{{name}}",name)
-			unsubscribe_link = request.build_absolute_uri(reverse('campaigns:unsubscribe', args=(campaign.slug,subscriber.id,)))
-			view_emails_here = request.build_absolute_uri(reverse('campaigns:emails', args=(campaign.slug,)))
-			home_url = request.build_absolute_uri(reverse('campaigns:campaign', args=(campaign.slug,)))
-			logo_url = request.build_absolute_uri(staticfiles_storage.url("images/%s_logo.png" % campaign.slug))
-			fromName = campaign.name 
-		    send(
-				subject,
-				body,
-				subscriber.email_address,
-				fromName,
-				fromAddress,
-				{
+				#Send welcome email email with approrpaite information
+				unsubscribe_link = request.build_absolute_uri(reverse('campaigns:unsubscribe', args=(campaign.slug,subscriber.id,)))
+				view_emails_here = request.build_absolute_uri(reverse('campaigns:emails', args=(campaign.slug,)))
+				home_url = request.build_absolute_uri(reverse('campaigns:campaign', args=(campaign.slug,)))
+				logo_url = request.build_absolute_uri(staticfiles_storage.url("images/%s_logo.png" % campaign.slug))
+				fromName = campaign.name 
+				
+				send(
+					subject,
+					body,
+					subscriber.email_address,
+					fromName,
+					fromAddress,
+					{
 					"{{name}}":name,
 					"{{deadline}}":deadline.strftime("%b %d, %Y"),
 					"{{first-email}}":first_email.strftime("%b %d, %Y"),
@@ -238,15 +240,12 @@ def campaign(request,campaign_slug):
 					"{{LOGO_URL}}":logo_url,
 
 					}
-			)
+				)
 
-		    return render(request, 'campaigns/thanks.html', {
-			  'subscriber': subscriber,'campaign':campaign
-			  })	    
+		return render(request, 'campaigns/thanks.html', {
+			'subscriber': subscriber,'campaign':campaign
+		})	    
 
-	    return render(request, 'campaigns/subscribe.html', {
-		'form': form,'campaign':campaign
-		  })	    
 	elif type == FIXED:
 	    if request.method == 'GET':
 		form = FixedForm(campaign=campaign)
