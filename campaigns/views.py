@@ -59,6 +59,7 @@ def campaign(request,campaign_slug):
 		  
 			###Save Data
 			name = form.cleaned_data['name']
+			name = name[0].upper() + name[1:]
 			email_address = form.cleaned_data['email_address']
 			subscriber = Subscriber.objects.create(name=name,
 						email_address=email_address)
@@ -148,6 +149,7 @@ def campaign(request,campaign_slug):
 
 			###Save Data
 				name = form.cleaned_data['name']
+				name = name[0].upper() + name[1:]
 				email_address = form.cleaned_data['email_address']
 				deadline = form.cleaned_data['deadline']
 				options = form.cleaned_data['options']
@@ -256,6 +258,7 @@ def campaign(request,campaign_slug):
 		# If data is valid, proceeds to create a new post and redirect the user
 		if form.is_valid():
 		    name = form.cleaned_data['name']
+		    name = name[0].upper() + name[1:]
 		    email_address = form.cleaned_data['email_address']
 		    options = form.cleaned_data['options']
 		    subscriber = Subscriber.objects.create(name=name,

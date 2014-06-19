@@ -10,7 +10,7 @@ def send(subject,body,toAddressesStr,fromName,fromAddress,replacements):
   ###Send Welcome Email
   htmlBody = "%s%s%s" % (HEADER,body,END)
 
-  textBody = strip_tags(body)
+  textBody = "%s\n\n\n%s" % (strip_tags(body), "Use link below to unsubscribe from these reminders: \n{{unsubscribe}}")
   textBody = textBody.replace("&nbsp;","")
   textBody = textBody.replace("&rsquo;","'")
   textBody = textBody.replace("&lsquo;","'")
