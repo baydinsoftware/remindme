@@ -5,26 +5,30 @@
 <head>
 	<link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css">
 	<link href="{{ STATIC_URL}}css/{{ campaign.slug }}_colors.css" rel="stylesheet" type="text/css">
+    <title>{{ campaign.name }}</title>
 
 </head>
 
 <div id='logo'><a href="{% url 'campaigns:campaign' campaign.slug %}"><img src="{{ STATIC_URL}}images/{{ campaign.slug }}_logo.png" /></a></div>
-<p>
-<center>
+<p class='centered'>
 Hey, {{ subscriber.name }}!<br />
 <br />
-Your email address, {{ subscriber.email_address }}, is currently subscribed to:
+Your email address, {{ subscriber.email_address }}, is currently subscribed to {{campaign.name}}.<br /><br />
+
+<!--
 <ul>
 {% for subscription in subscriptions %}
 	<li>{{ subscription.subscription }}</li>
 {% endfor %}
 </ul>
-
+-->
 Click below to unsubscribe from these reminders.
-<br /><br />
+</p>
 <form action="" method='post'>{% csrf_token %}
+<p class='centered'>
 <input type='submit' value='Unsubscribe' />
-</form></center></p>
+</p>
+</form>
 <div id="footer">
 	Brought to you by the makers of Boomerang for Gmail, Boomerang Calendar, Inbox Pause, Boomerang for Android, Boomerang for Outlook and whatever else we make.
 </div>

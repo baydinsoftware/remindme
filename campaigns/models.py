@@ -17,7 +17,7 @@ class Campaign(models.Model):
 	description = models.TextField()
         
 	welcome_subject = models.CharField(max_length=100,help_text='This email is sent immediately when user subscribes')
-	welcome_content = HTMLField(help_text="You can use the following shortcodes: {{name}} {{view-emails}} {{unsubscribe}} {{months-away}}*deadline-only")
+	welcome_content = HTMLField(help_text="You can use the following shortcodes: {{name}} {{view-emails}} {{unsubscribe}} **{{deadline}} {{first-email}} {{months-away}}*deadline-only")
         
 	unsubscribe_subject = models.CharField(max_length=100,help_text='This email will eventually be sent when user unsubscribes')
         unsubscribe_content = HTMLField(help_text="You can use the following shortcodes: {{name}} ")
@@ -37,7 +37,7 @@ class DeadlineCampaign(Campaign):
 
 class DeadlineOption(models.Model):
 	name = models.CharField(max_length=100)
-	description = models.TextField()
+	description = HTMLField(help_text='This is the text that will be displayed on the subscription page.')
 	required = models.BooleanField(default=False,help_text='Subscribing to this campaign should automatically subscribe users to this option.')
 	campaign = models.ForeignKey(DeadlineCampaign)
 
@@ -77,7 +77,7 @@ class FixedCampaign(Campaign):
 
 class FixedOption(models.Model):
 	name = models.CharField(max_length=100)
-	description = models.TextField()
+	description = HTMLField(help_text='This is the text that will be displayed on the subscription page.')
 	campaign = models.ForeignKey(FixedCampaign)
 
 	def __unicode__(self):

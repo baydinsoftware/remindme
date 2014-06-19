@@ -3,18 +3,19 @@
 <head>
 	<link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css">
 	<link href="{{ STATIC_URL}}css/{{ campaign.slug }}_colors.css" rel="stylesheet" type="text/css">
-
+    <title>{{ campaign.name }}</title>
 </head>
 
 <script src="http://cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js">
 </script>
 
 <div id='logo'><a href="{% url 'campaigns:campaign' campaign.slug %}"><img src="{{ STATIC_URL}}images/{{ campaign.slug }}_logo.png" /></a></div>
-<p>
+<p class='text'>
 {{ campaign.description }}
 <br /><br />
-<center><a href="{% url 'campaigns:emails' campaign.slug %}">What emails will I be recieving?</a>
-</center>
+</p>
+<p class="centered">
+<a href="{% url 'campaigns:emails' campaign.slug %}">What emails will I be recieving?</a>
 </p>
 
 
@@ -42,24 +43,23 @@
 	{% endif %}
 	{% if form.deadline %}
             <div class="label">
-            {{ form.deadline.label_tag }}
-            </div>{{ form.deadline }}
-            {{ form.deadline.errors }}
+            <span class='deadline_label'>The Big Date:</span>
+            </div>{{ form.deadline }}<br />
+            {{ form.deadline.errors }}<br />
 	{% endif %}
+	<div id ='options'>
 	{% if form.options %}
-		<div id ='options'>
-		Which would you like to recieve reminders about?
+
+		{% if  form.options.field.choices|length > 0 %}
+			Which would you like to recieve reminders about?<br /><br />
             {{ form.options.errors }}
- 			<ul id="id_options">
-			{% for choice in form.options.field.choices %}
-			  <li>
-			    <input type="checkbox" id="id_options_{{choice.0}}" name="options" value="{{choice.0}}"/>
-			    <label for="id_options_{{choice.0}}">{{choice.1}}</label>
-			  </li>
-			{% endfor %}
-			</ul>         
-		</div>
+            <table>
+            {{form.options}}
+            </table>
+		
+		{% endif %}
 	{% endif %}
+	</div>
 	<script>
 		var tz = jstz.determine(); // Determines the time zone of the browser client
 		document.write('<input type="hidden" name="timezone" value="');

@@ -23,9 +23,6 @@ body
 	padding: 30px;
 	margin-top: 20px;
  }
- .emails p {
- 	width: 100%;
- }
 
 input[type=submit] {
 	border-radius: 3px;
@@ -43,10 +40,13 @@ input[type=submit] {
 .errorlist {
 	list-style-type: none;
 }
-p {
+.text {
 	width: 500px;
 	margin: auto;
 	clear:both;
+}
+.centered{
+	text-align:center;
 }
 .label {
 	float: left;
@@ -99,13 +99,21 @@ p label[for=id_options_0] {
 	width: 100%;
 	float:left;
 	margin-top: 14px;
+	text-align: center;
+
 }
-#options input {
-	float:left;
-	margin-left: 90px;
-}
-#options label {
-	float: left;
-	width: 280px;
+#options table {
+	font-family: Georgia;
+	font-size: 14px;
+	line-height: 24px;
+	vertical-align:text-top;
 	text-align: left;
+}
+.checkbox {
+	vertical-align:text-top;
+}
+
+#options .description {
+	padding-bottom: 10px;
+
 }

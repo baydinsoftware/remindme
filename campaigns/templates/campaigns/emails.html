@@ -3,15 +3,16 @@
 <head>
 	<link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css">
 	<link href="{{ STATIC_URL}}css/{{ campaign.slug }}_colors.css" rel="stylesheet" type="text/css">
+    <title>{{ campaign.name }}</title>
 
 </head>
 
 <div id='logo'><a href="{% url 'campaigns:campaign' campaign.slug %}"><img src="{{ STATIC_URL}}images/{{ campaign.slug }}_logo.png" /></a></div>
 
-<p>{{ campaign.description }}</p>
-<p><center>
+<p class='text'>{{ campaign.description }}</p>
+<p class='centered'
 <br /><a href="{% url 'campaigns:campaign' campaign.slug %}">Subscribe</a>
-</center></p>
+</p>
 {% for email in emails %}
 <div class="emails">	
 <b>Subject:</b> {{ email.subject }}

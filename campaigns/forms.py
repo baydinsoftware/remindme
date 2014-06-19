@@ -43,7 +43,9 @@ class DeadlineForm(ModelForm):
 		self.fields['options']= forms.ModelMultipleChoiceField(
 			required=False,
 			queryset = DeadlineOption.objects.filter(required=False,campaign=campaign),
-			widget=forms.CheckboxSelectMultiple,
+			widget=OptionsWidget(
+                  			fields=('description',),
+                  			)
 			)
 		self.fields['deadline'].required = True
 		self.fields['deadline'].widget = SelectDateWidget()
@@ -60,10 +62,6 @@ class DeadlineForm(ModelForm):
                 return cleaned_data
 
 
-class MyMultipleModelChoiceField(forms.ModelMultipleChoiceField):
-
-    def label_from_instance(self, obj):
-        return "%s | &s" % (obj.name, obj.field1)
 
 class FixedForm(ModelForm):
 
@@ -77,7 +75,9 @@ class FixedForm(ModelForm):
                 super(FixedForm, self).__init__(*args, **kwargs)
                 self.fields['options']= forms.ModelMultipleChoiceField(
                         queryset = FixedOption.objects.filter(campaign=campaign),
-                        widget=forms.CheckboxSelectMultiple,
+                        widget=OptionsWidget(
+                  			fields=('description',),
+                  			)
                         )
         
         class Meta:
@@ -93,6 +93,79 @@ class FixedForm(ModelForm):
                 return cleaned_data
 
 
+class OptionsWidget(forms.widgets.SelectMultiple):
+
+  def __init__(self, *a, **kw):
+      self.fields = kw.pop('fields', []) # list of attrs
+      self.rns = kw.pop('related_null_string', 'Null')
+      super(OptionsWidget, self).__init__(*a, **kw)
+
+  def render(self, name, value, attrs=None, choices=()):
+      from itertools import chain
+      from django.forms.widgets import CheckboxInput
+      from django.utils.encoding import force_unicode
+      from django.utils.html import conditional_escape
+      from django.utils.safestring import mark_safe
+
+      if value is None: value = []
+      has_id = attrs and 'id' in attrs
+      final_attrs = self.build_attrs(attrs, name=name)
+      output = []
+      # Normalize to strings
+      str_values = set([force_unicode(v) for v in value])
+      for i, (option_value, option_label) in enumerate(chain(self.choices,
+                                                             choices)):
+          # If an ID attribute was given, add a numeric index as a suffix,
+          # so that the checkboxes don't all have the same ID attribute.
+          if has_id:
+              final_attrs = dict(final_attrs, id='%s_%s' % (attrs['id'], i))
+              label_for = u' for="%s"' % final_attrs['id']
+          else:
+              label_for = ''
+
+          cb = CheckboxInput(
+              final_attrs, check_test=lambda value: value in str_values)
+          option_value = force_unicode(option_value)
+          rendered_cb = cb.render(name, option_value)
+          option_label = conditional_escape(force_unicode(option_label))
+          instance = self.choices.queryset.model.objects.get(id=option_value)
+          rendered_fields = []
+          for f in self.fields:
+              try:
+                  v = getattr(instance, f)
+                  if hasattr(v, 'all'):
+                      v = list(getattr(v, 'all')())
+                      if v:
+                          v = ', '.join([unicode(s) for s in v])
+                      else:
+                          v = self.rns # set to related_null_string
+                  elif isinstance(v, datetime.datetime):
+                      v = v.strftime('%b %d, %Y')
+
+                  if isinstance(v, bool):
+                      rendered_fields.append(
+                          '<td class="%s"><span class="%s">%s</span></td>' % (
+                              f, str(v).lower(), str(v).lower() )
+                       )
+
+                  else:
+                      rendered_fields.append(
+                          '<td class="%s">%s</td>' % (f, v))
+
+              except AttributeError:
+                  rendered_fields.append(
+                      '<td class="%s">None</td>' % f)
 
 
+          output.append('<tr><td class="checkbox">%s</td>%s</tr>'
+                        % (rendered_cb, ''.join(rendered_fields)))
 
+      #output.append(u'</table>')
+      return mark_safe(u'\n'.join(output))
+
+  def id_for_label(self, id_):
+      # See the comment for RadioSelect.id_for_label()
+      if id_:
+          id_ += '_0'
+      return id_
+  id_for_label = classmethod(id_for_label)
