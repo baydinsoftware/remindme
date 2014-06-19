@@ -1,3 +1,5 @@
+<!DOCTYPE html>
+
 {% load static  %}
 
 <head>
@@ -6,25 +8,31 @@
     <title>{{ campaign.name }}</title>
 
 </head>
+	<body>
+	<div id='logo'>
+		<a href="{% url 'campaigns:campaign' campaign.slug %}">
+			<img src="{{ STATIC_URL}}images/{{ campaign.slug }}_logo.png" />
+		</a>
+	</div>
 
-<div id='logo'><a href="{% url 'campaigns:campaign' campaign.slug %}"><img src="{{ STATIC_URL}}images/{{ campaign.slug }}_logo.png" /></a></div>
-
-<p class='text'>{{ campaign.description }}</p>
-<p class='centered'
-<br /><a href="{% url 'campaigns:campaign' campaign.slug %}">Subscribe</a>
-</p>
-{% for email in emails %}
-<div class="emails">	
-<b>Subject:</b> {{ email.subject }}
-	<br />
-	<b>Send date:</b>
-	 {{ email.send_date }}
-	<br />
-	<hr>
-	{% autoescape off %}{{ email.content }}{% endautoescape %}
-</div>
-<br/ ><br />
-{% endfor %}
-<div id="footer">
-	Brought to you by the makers of Boomerang for Gmail, Boomerang Calendar, Inbox Pause, Boomerang for Android, Boomerang for Outlook and whatever else we make.
-</div>
+	<p class='text'>
+		{{ campaign.description }}
+	</p>
+	<p class='centered'
+		<a href="{% url 'campaigns:campaign' campaign.slug %}">Subscribe</a>
+	</p>
+	{% for email in emails %}
+		<div class="emails">	
+			<b>Subject:</b> {{ email.subject }}
+			<br />
+			<b>Send date:</b>
+			{{ email.send_date }}
+			<br />
+			<hr>
+			{% autoescape off %}{{ email.content }}{% endautoescape %}
+		</div>
+	{% endfor %}
+	<div id="footer">
+		Brought to you by the makers of Boomerang for Gmail, Boomerang Calendar, Inbox Pause, Boomerang for Android, Boomerang for Outlook and whatever else we make.
+	</div>
+</body>

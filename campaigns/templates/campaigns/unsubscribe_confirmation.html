@@ -1,4 +1,4 @@
-
+<!DOCTYPE html> 
 
 {% load static  %}
 
@@ -9,12 +9,19 @@
 
 </head>
 
-<div id='logo'><a href="{% url 'campaigns:campaign' campaign.slug %}"><img src="{{ STATIC_URL}}images/{{ campaign.slug }}_logo.png" /></a></div>
-<p class='centered'>
-We're sad to see you go, {{ subscriber.name }}
-<br /><br />
-Maybe we'll see you around.
-</p>
-<div id="footer">
-	Brought to you by the makers of Boomerang for Gmail, Boomerang Calendar, Inbox Pause, Boomerang for Android, Boomerang for Outlook and whatever else we make.
-</div>
+<body>
+	<div id='logo'>
+		<a href="{% url 'campaigns:campaign' campaign.slug %}">
+			<img src="{{ STATIC_URL}}images/{{ campaign.slug }}_logo.png" />
+		</a>
+	</div>
+	<p class='centered'>
+		We're sad to see you go, {{ subscriber.name }}
+	</p>
+	<p class='centered'>
+		Maybe we'll see you around.
+	</p>
+	<div id="footer">
+		Brought to you by the makers of Boomerang for Gmail, Boomerang Calendar, Inbox Pause, Boomerang for Android, Boomerang for Outlook and whatever else we make.
+	</div>
+</body>

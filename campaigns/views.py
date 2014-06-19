@@ -443,6 +443,7 @@ def unsubscribe(request,subscriber_id,campaign_slug):
 					"{{HOME_URL}}":home_url,
 					"{{CAMPAIGN_NAME}}":campaign.name,
 					"{{LOGO_URL}}":logo_url,
+					"{{unsubscribe}}":"",
 
 					}
 			)

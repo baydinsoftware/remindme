@@ -1,75 +1,83 @@
+<!DOCTYPE html>
+
 {% load static  %}
 
 <head>
 	<link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css">
 	<link href="{{ STATIC_URL}}css/{{ campaign.slug }}_colors.css" rel="stylesheet" type="text/css">
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js">
+	</script>
     <title>{{ campaign.name }}</title>
 </head>
+<body>
 
-<script src="http://cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js">
-</script>
-
-<div id='logo'><a href="{% url 'campaigns:campaign' campaign.slug %}"><img src="{{ STATIC_URL}}images/{{ campaign.slug }}_logo.png" /></a></div>
-<p class='text'>
-{{ campaign.description }}
-<br /><br />
-</p>
-<p class="centered">
-<a href="{% url 'campaigns:emails' campaign.slug %}">What emails will I be recieving?</a>
-</p>
-
-
-<div id="form">
-	<form action="" method='post'>{% csrf_token %}
-	{% if form.name %}
-            <div class='field'>
-            <div class="label">
-            {{ form.name.label_tag }}
-            </div>{{ form.name }}
-            {{ form.name.errors }}
-            </div>
-	{% endif %}
-	{% if form.email_address %}
-            <div class="label">
-            {{ form.email_address.label_tag }}
-            </div>{{ form.email_address }}
-            {{ form.email_address.errors }}
-	{% endif %}
-	{% if form.confirm_email %}
-            <div class="label">
-            {{ form.confirm_email.label_tag }}
-            </div>{{ form.confirm_email }}
-            {{ form.confirm_email.errors }}
-	{% endif %}
-	{% if form.deadline %}
-            <div class="label">
-            <span class='deadline_label'>The Big Date:</span>
-            </div>{{ form.deadline }}<br />
-            {{ form.deadline.errors }}<br />
-	{% endif %}
-	<div id ='options'>
-	{% if form.options %}
-
-		{% if  form.options.field.choices|length > 0 %}
-			Which would you like to recieve reminders about?<br /><br />
-            {{ form.options.errors }}
-            <table>
-            {{form.options}}
-            </table>
-		
-		{% endif %}
-	{% endif %}
+	<div id='logo'>
+		<a href="{% url 'campaigns:campaign' campaign.slug %}">
+			<img src="{{ STATIC_URL}}images/{{ campaign.slug }}_logo.png" />
+		</a>
 	</div>
-	<script>
-		var tz = jstz.determine(); // Determines the time zone of the browser client
-		document.write('<input type="hidden" name="timezone" value="');
-		document.write(tz.name());
-		document.write('">');
-	</script>
+	<p class='text'>
+		{{ campaign.description }}
+	</p>
+	<p class="centered">
+		<a href="{% url 'campaigns:emails' campaign.slug %}">What emails will I be recieving?</a>
+	</p>
 
-	<input type='submit' value='Sign me up!' />
-	</form>
-</div>
-<div id="footer">
-	Brought to you by the makers of Boomerang for Gmail, Boomerang Calendar, Inbox Pause, Boomerang for Android, Boomerang for Outlook and whatever else we make.
-</div>
+	<div id="form">
+		<form action="" method='post'>{% csrf_token %}
+		{% if form.name %}
+	            <div class='field'>
+	            <div class="label">
+	            {{ form.name.label_tag }}
+	            </div>{{ form.name }}
+	            {{ form.name.errors }}
+	            </div>
+		{% endif %}
+		{% if form.email_address %}
+	            <div class="label">
+	            {{ form.email_address.label_tag }}
+	            </div>{{ form.email_address }}
+	            {{ form.email_address.errors }}
+		{% endif %}
+		{% if form.confirm_email %}
+	            <div class="label">
+	            {{ form.confirm_email.label_tag }}
+	            </div>{{ form.confirm_email }}
+	            {{ form.confirm_email.errors }}
+		{% endif %}
+		{% if form.deadline %}
+	            <div class="label">
+	            <span class='deadline_label'>The Big Date:</span>
+	            </div>{{ form.deadline }}<br />
+	            {{ form.deadline.errors }}<br />
+		{% endif %}
+
+		<div id ='options'>
+		{% if form.options %}
+
+			{% if  form.options.field.choices|length > 0 %}
+				Which would you like to recieve reminders about?<br />
+	            {{ form.options.errors }}
+	            <table>
+	            {{form.options}}
+	            </table>
+			
+			{% endif %}
+		{% endif %}
+		</div>
+
+		<script>
+			var tz = jstz.determine(); // Determines the time zone of the browser client
+			document.write('<input type="hidden" name="timezone" value="');
+			document.write(tz.name());
+			document.write('">');
+		</script>
+
+		<input type='submit' value='Sign me up!' />
+		</form>
+	</div>
+
+	<div id="footer">
+		Brought to you by the makers of Boomerang for Gmail, Boomerang Calendar, Inbox Pause, Boomerang for Android, Boomerang for Outlook and whatever else we make.
+	</div>
+</body>
