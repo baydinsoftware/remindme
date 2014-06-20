@@ -16,13 +16,14 @@
 			<img src="{{ STATIC_URL}}images/{{ campaign.slug }}_logo.png" />
 		</a>
 	</div>
-	<p class='text'>
-		{{ campaign.description }}
-	</p>
+	<div class='text'>
+		{% autoescape off %}{{ description_text }}{% endautoescape %}
+	</div>
+	<!--
 	<p class="centered">
-		<a href="{% url 'campaigns:emails' campaign.slug %}">What emails will I be recieving?</a>
+		<a href="{% url 'campaigns:overview' campaign.slug %}">What emails will I be recieving?</a>
 	</p>
-
+	-->
 	<div id="form">
 		<form action="" method='post'>{% csrf_token %}
 		{% if form.name %}

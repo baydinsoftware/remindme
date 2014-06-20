@@ -14,16 +14,16 @@
 			<img src="{{ STATIC_URL}}images/{{ campaign.slug }}_logo.png" />
 		</a>
 	</div>
-	<p class='text'>
+	<div class='text'>
 		{% autoescape off %}{{ campaign.overview }}{% endautoescape %}
-	</p>		
+	</div>
 	<!--
 	This commeneted out section is for displaying all the emails' content.
 
 	<p class='text'>
 		{{ campaign.description }}
 	</p>
-	<p class='centered'>
+	<p class='centered'
 		<a href="{% url 'campaigns:campaign' campaign.slug %}">Subscribe</a>
 	</p>
 	{% for email in emails %}

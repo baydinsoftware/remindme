@@ -14,10 +14,11 @@ class Campaign(models.Model):
         slug = models.SlugField(unique=True,help_text='Name displayed in URL' )
 
 	name = models.CharField(max_length=200)        
-	description = models.TextField()
+	description = HTMLField(help_text="Text displayed on subscribe page. You can use the following shortcodes: {{overview_url}}. You can directly paste HTML entities such as: &squ;")
+	overview = HTMLField(help_text="Text displayed on the overview page. You can directly paste HTML entities such as: &squ;",default="Overview for this campaign is unavailable.")
         
 	welcome_subject = models.CharField(max_length=100,help_text='This email is sent immediately when user subscribes')
-	welcome_content = HTMLField(help_text="You can use the following shortcodes: {{name}} {{view-emails}} {{unsubscribe}} **{{deadline}} {{first-email}} {{months-away}}*deadline-only. You can directly paste HTML entities such as: &squ;")
+	welcome_content = HTMLField(help_text="You can use the following shortcodes: {{name}} {{overview_url}} {{unsubscribe}} **{{deadline}} {{first-email}} {{months-away}}*deadline-only. You can directly paste HTML entities such as: &squ;")
         
 	unsubscribe_subject = models.CharField(max_length=100,help_text='This email will eventually be sent when user unsubscribes')
         unsubscribe_content = HTMLField(help_text="You can use the following shortcodes: {{name}} You can directly paste HTML entities such as: &squ;")
@@ -28,10 +29,10 @@ class Campaign(models.Model):
 class DeadlineCampaign(Campaign):
 
 	before_welcome_subject = models.CharField(max_length=100,help_text='This email is sent in place of standard welcome if user subscribes some amount of time before first email would be sent as determine by ontime margin above')
-        before_welcome_content = HTMLField(help_text="You can use the following shortcodes: {{name}} {{view-emails}} {{deadline}} {{first-email}} {{unsubscribe}} {{months-away}} You can directly paste HTML entities such as: &squ;")
+        before_welcome_content = HTMLField(help_text="You can use the following shortcodes: {{name}} {{overview_url}} {{deadline}} {{first-email}} {{unsubscribe}} {{months-away}} You can directly paste HTML entities such as: &squ;")
 
         after_welcome_subject = models.CharField(max_length=100,help_text='This email is sent in place of standard welcome if user subscribes some amount of time after first email would be sent as determine by ontime margin above')
-	after_welcome_content = HTMLField(help_text="You can use the following shortcodes: {{name}} {{view-emails}} {{deadline}} {{first-email}} {{unsubscribe}} {{months-away}} You can directly paste HTML entities such as: &squ;")
+	after_welcome_content = HTMLField(help_text="You can use the following shortcodes: {{name}} {{overview_url}} {{deadline}} {{first-email}} {{unsubscribe}} {{months-away}} You can directly paste HTML entities such as: &squ;")
 	deadline_name = models.CharField(max_length=100,help_text='Name for deadline field on subscription page')
 	options_question = models.CharField(max_length=100,help_text='Question for options on subscription page',default="Which would you like to recieve reminders about?")
 	ontime_margin_in_weeks = models.IntegerField(help_text='Number of weeks before and after first email would be sent that is considered an "on time" start for which user recieves standard welcome email')
@@ -50,12 +51,12 @@ class DeadlineEmail(Email):
 	delta_days = models.IntegerField(help_text='Number of days before deadline this email should be sent (compounds on top of months). Use negative integers to send after deadline. Note: Any changes after initial creation will only affect future subscribers.')
 	
         send_time = models.TimeField()
-	content_beginning = HTMLField(help_text='The content of email preceding any "add-ons" from other subscriptions. You can use the following shortcodes: {{name}} {{deadline}} {{view-emails}} {{unsubscribe}} You can directly paste HTML entities such as: &squ;')
-	content_end = HTMLField(help_text='The content of email following the "add-ons" from other subscriptions. You can use the following shortcodes: {{name}} {{deadline}} {{view-emails}} {{unsubscribe}} You can directly paste HTML entities such as: &squ; ')
+	content_beginning = HTMLField(help_text='The content of email preceding any "add-ons" from other subscriptions. You can use the following shortcodes: {{name}} {{deadline}} {{overview_url}} {{unsubscribe}} You can directly paste HTML entities such as: &squ;')
+	content_end = HTMLField(help_text='The content of email following the "add-ons" from other subscriptions. You can use the following shortcodes: {{name}} {{deadline}} {{overview_url}} {{unsubscribe}} You can directly paste HTML entities such as: &squ; ')
 	option = models.ForeignKey(DeadlineOption, help_text='This email is sent only to subscribers of the option selected here. ')
 
 class DeadlineAddOn(models.Model):
-	content = HTMLField(help_text='You can use the following shortcodes: {{name}} {{deadline}} {{view-emails}} {{unsubscribe}} You can directly paste HTML entities such as: &squ;')
+	content = HTMLField(help_text='You can use the following shortcodes: {{name}} {{deadline}} {{overview_url}} {{unsubscribe}} You can directly paste HTML entities such as: &squ;')
 	email = models.ForeignKey(DeadlineEmail)
 	option = models.ForeignKey(DeadlineOption, help_text='This content will appear between content beginning and end from above only if the user is also subscribed to the option selected here.')
 
@@ -68,7 +69,7 @@ class RelativeStartEmail(Email):
 	delta_months = models.IntegerField(help_text='Number of months before deadline this email should be sent.  Note: Any changes after initial creation will only affect future subscribers.')        
 	delta_days = models.IntegerField(help_text='Number of days before deadline this email should be sent (compounds on top of months). Note: Any changes after initial creation will only affect future subscribers.')
         send_time = models.TimeField(help_text="Currently CA time- need to change to base of local users time")
-	content = HTMLField(help_text="You can use the following shortcodes: {{name}} {{view-emails}} {{unsubscribe}} You can directly paste HTML entities such as: &squ;")
+	content = HTMLField(help_text="You can use the following shortcodes: {{name}} {{overview_url}} {{unsubscribe}} You can directly paste HTML entities such as: &squ;")
 	campaign = models.ForeignKey(RelativeStartCampaign)
 
 #######
@@ -86,7 +87,7 @@ class FixedOption(models.Model):
 
 class FixedEmail(Email):
 	send_date = models.DateTimeField(help_text="This date/time is in UTC. Emails to all subscribers will be sent at this time UTC regardless of your or the subscribers' time zone. UTC is 8hr ahead of CA (7hr during Summer Day Light Savings).")
-	content = HTMLField(help_text="You can use the following shortcodes: {{name}} {{unsubscribe}} {{view-emails}}. You can directly paste HTML entities such as: &squ;")
+	content = HTMLField(help_text="You can use the following shortcodes: {{name}} {{unsubscribe}} {{overview_url}}. You can directly paste HTML entities such as: &squ;")
 	option = models.ForeignKey(FixedOption, help_text='This email will be sent to users subscribed to this option.')
 	email_sent = models.BooleanField(default=False, help_text="This is automatically set to true when this email has been sent to all subscribers.")
 

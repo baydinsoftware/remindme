@@ -30,7 +30,7 @@ class Command(NoArgsCommand):
 				object_id=option.id,
 				content_type=ContentType.objects.get_for_model(option)
 			)
-			view_emails_here = "%s%s" % (settings.CAMPAIGN_URL.get(option.campaign.slug), reverse('campaigns:emails', args=(option.campaign.slug,)))
+			overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(option.campaign.slug), reverse('campaigns:overview', args=(option.campaign.slug,)))
 			home_url = settings.CAMPAIGN_URL.get(option.campaign.slug)
 			logo_url = "%s/static/images/%s_logo.png" % (home_url,option.campaign.slug)
 			for subscription in subscriptions:
@@ -46,7 +46,7 @@ class Command(NoArgsCommand):
 					{
 					"{{name}}":subscription.subscriber.name,
 					"{{unsubscribe}}":unsubscribe_link,
-					"{{view-emails}}":view_emails_here,
+					"{{overview_url}}":overview_url,
 					"{{HOME_URL}}":settings.CAMPAIGN_URL.get(option.campaign.slug),
 					"{{CAMPAIGN_NAME}}":option.campaign.name,
 					"{{LOGO_URL}}":logo_url,
@@ -81,7 +81,7 @@ class Command(NoArgsCommand):
 				deadline_utc = email_on_queue.subscription.subscriber.deadline.strftime("%b %d, %Y")
 				slug = email_on_queue.subscription.subscription.campaign.slug
 				unsubscribe_link = "%s/%s/unsubscribe/%s" % (settings.CAMPAIGN_URL.get(slug), slug, subscription.subscriber.id)
-				view_emails_here = "%s%s" % (settings.CAMPAIGN_URL.get(slug), reverse('campaigns:emails', args=(slug,)))
+				overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(slug), reverse('campaigns:overview', args=(slug,)))
 				home_url = settings.CAMPAIGN_URL.get(slug)
 				logo_url = "%s/static/images/%s_logo.png" % (home_url, slug)
 				fromName = email_on_queue.subscription.subscription.campaign.name
@@ -95,7 +95,7 @@ class Command(NoArgsCommand):
 					"{{name}}":email_on_queue.subscription.subscriber.name,
 					"{{deadline}}":deadline_utc,
 					"{{unsubscribe}}":unsubscribe_link,
-					"{{view-emails}}":view_emails_here,
+					"{{overview_url}}":overview_url,
 					"{{HOME_URL}}":home_url,
 					"{{CAMPAIGN_NAME}}":campaign.name,
 					"{{LOGO_URL}}":logo_url,
@@ -109,7 +109,7 @@ class Command(NoArgsCommand):
 
 				slug = email_on_queue.subscription.subscription.slug
 				unsubscribe_link = "%s/%s/unsubscribe/%s" % (settings.CAMPAIGN_URL.get(slug), slug, email_on_queue.subscription.subscriber.id)
-				view_emails_here = "%s%s" % (settings.CAMPAIGN_URL.get(slug), reverse('campaigns:emails', args=(slug,)))
+				overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(slug), reverse('campaigns:overview', args=(slug,)))
 				home_url = settings.CAMPAIGN_URL.get(slug)
 				logo_url = "%s/static/images/%s_logo.png" % (home_url, slug)
 				fromName = email_on_queue.subscription.subscription.name
@@ -122,7 +122,7 @@ class Command(NoArgsCommand):
 					{
 					"{{name}}":email_on_queue.subscription.subscriber.name,
 					"{{unsubscribe}}":unsubscribe_link,
-					"{{view-emails}}":view_emails_here,
+					"{{overview_url}}":overview_url,
 					"{{HOME_URL}}":home_url,
 					"{{CAMPAIGN_NAME}}":email_on_queue.subscription.subscription.name,
 					"{{LOGO_URL}}":logo_url,

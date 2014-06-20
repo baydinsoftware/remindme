@@ -51,6 +51,11 @@ def campaign(request,campaign_slug):
 	if type == RELATIVE:
 	    if request.method == 'GET':
 		form = RelativeStartForm()
+		overview_url =  request.build_absolute_uri(reverse('campaigns:overview', args=(campaign.slug,)))
+		description_text = campaign.description.replace("{{overview_url}}",overview_url)
+		return render(request, 'campaigns/subscribe.html', {
+		'form': form,'campaign':campaign,'description_text':description_text
+		  })
 	    else:
 		# A POST request: Handle Form Upload
 		form = RelativeStartForm(request.POST) # Bind data from request.POST into a PostForm
@@ -69,7 +74,7 @@ def campaign(request,campaign_slug):
 
 			#send email with appropriate shortcodes replaced
 			unsubscribe_link = request.build_absolute_uri(reverse('campaigns:unsubscribe', args=(campaign.slug,subscriber.id,)))
-			view_emails_here = request.build_absolute_uri(reverse('campaigns:emails', args=(campaign.slug,)))
+			overview_url = request.build_absolute_uri(reverse('campaigns:overview', args=(campaign.slug,)))
 			home_url = request.build_absolute_uri(reverse('campaigns:campaign', args=(campaign.slug,)))
 			logo_url = request.build_absolute_uri(staticfiles_storage.url("images/%s_logo.png" % campaign.slug))
 			fromName = campaign.name
@@ -82,7 +87,7 @@ def campaign(request,campaign_slug):
 				{
 					"{{name}}":name,
 					"{{unsubscribe}}":unsubscribe_link,
-					"{{view-emails}}":view_emails_here,
+					"{{overview_url}}":overview_url,
 					"{{HOME_URL}}":home_url,
 					"{{CAMPAIGN_NAME}}":campaign.name,
 					"{{LOGO_URL}}":logo_url,
@@ -129,16 +134,16 @@ def campaign(request,campaign_slug):
 		    ###Display Thank you screen
 			return render(request, 'campaigns/thanks.html', {
 			  'subscriber': subscriber,'campaign':campaign
-			  })	    
-	
-	    return render(request, 'campaigns/subscribe.html', {
-		'form': form,'campaign':campaign
-		  })
+			  })
+
+	    
 	elif type == DEADLINE:
 		if request.method == 'GET':
 			form = DeadlineForm(campaign=campaign)
+			overview_url =  request.build_absolute_uri(reverse('campaigns:overview', args=(campaign.slug,)))
+			description_text = campaign.description.replace("{{overview_url}}",overview_url)
 			return render(request, 'campaigns/subscribe.html', {
-				'form': form,'campaign':campaign
+				'form': form,'campaign':campaign,'description_text':description_text
 			})	    
 		else:
 			# A POST request: Handle Form Upload
@@ -168,6 +173,11 @@ def campaign(request,campaign_slug):
 				required_options = DeadlineOption.objects.filter(campaign=campaign,required=True)		    
 				all_options = chain(required_options, options)
 
+				###Calculate ranges for each Welcome Email
+				now_utc = datetime.utcnow().replace(tzinfo=utc_zone)
+				before_date = now_utc + relativedelta(weeks=-campaign.ontime_margin_in_weeks)
+				after_date = now_utc + relativedelta(weeks=campaign.ontime_margin_in_weeks)
+
 				first_email = deadline_local #we're going to store the earliest email this subscriber would get to calculate appropriate welcome
 				for option in all_options:
 					subscription = Subscription.objects.create(subscriber=subscriber,
@@ -194,14 +204,9 @@ def campaign(request,campaign_slug):
 						if first_email > send_date_utc:
 							first_email = send_date_utc
 						#only add to queue if its send date has yet to happen
-						if send_date_utc > now_utc:
+						if send_date_utc > after_date:
 							queue = EmailQueue.objects.create(send_date=send_date_utc,subscription=subscription,email=email)
 							
-				###Calculate ranges for each Welcome Email
-				now_utc = datetime.utcnow().replace(tzinfo=utc_zone)
-				before_date = now_utc + relativedelta(weeks=-campaign.ontime_margin_in_weeks)
-				after_date = now_utc + relativedelta(weeks=campaign.ontime_margin_in_weeks)
-
 				months_away = 0
 				for r in rrule.rrule(rrule.MONTHLY, bymonthday=(deadline_utc.day, -1), bysetpos=1, dtstart=now_utc, until=deadline_utc):
 					months_away += 1
@@ -219,7 +224,7 @@ def campaign(request,campaign_slug):
 				
 				#Send welcome email email with approrpaite information
 				unsubscribe_link = request.build_absolute_uri(reverse('campaigns:unsubscribe', args=(campaign.slug,subscriber.id,)))
-				view_emails_here = request.build_absolute_uri(reverse('campaigns:emails', args=(campaign.slug,)))
+				overview_url = request.build_absolute_uri(reverse('campaigns:overview', args=(campaign.slug,)))
 				home_url = request.build_absolute_uri(reverse('campaigns:campaign', args=(campaign.slug,)))
 				logo_url = request.build_absolute_uri(staticfiles_storage.url("images/%s_logo.png" % campaign.slug))
 				fromName = campaign.name 
@@ -236,7 +241,7 @@ def campaign(request,campaign_slug):
 					"{{first-email}}":first_email.strftime("%b %d, %Y"),
 					"{{months-away}}":str(months_away),
 					"{{unsubscribe}}":unsubscribe_link,
-					"{{view-emails}}":view_emails_here,
+					"{{overview_url}}":overview_url,
 					"{{HOME_URL}}":home_url,
 					"{{CAMPAIGN_NAME}}":campaign.name,
 					"{{LOGO_URL}}":logo_url,
@@ -272,7 +277,7 @@ def campaign(request,campaign_slug):
 					subscription=option)
 
 		    unsubscribe_link = request.build_absolute_uri(reverse('campaigns:unsubscribe', args=(campaign.slug,subscriber.id,)))
-		    view_emails_here =  request.build_absolute_uri(reverse('campaigns:emails', args=(campaign.slug,)))
+		    overview_url =  request.build_absolute_uri(reverse('campaigns:overview', args=(campaign.slug,)))
 
 		    home_url = request.build_absolute_uri(reverse('campaigns:campaign', args=(campaign.slug,)))
 		    logo_url = request.build_absolute_uri(staticfiles_storage.url("images/%s_logo.png" % campaign.slug))
@@ -287,7 +292,7 @@ def campaign(request,campaign_slug):
 				{
 					"{{name}}":name,
 					"{{unsubscribe}}":unsubscribe_link,
-					"{{view-emails}}":view_emails_here,
+					"{{view-overview_url}}":overview_url,
 					"{{HOME_URL}}":home_url,
 					"{{CAMPAIGN_NAME}}":campaign.name,
 					"{{LOGO_URL}}":logo_url,
@@ -298,16 +303,17 @@ def campaign(request,campaign_slug):
 		    return render(request, 'campaigns/thanks.html', {
 			  'subscriber': subscriber,'campaign':campaign
 			  })	    
-	
+	    overview_url =  request.build_absolute_uri(reverse('campaigns:overview', args=(campaign.slug,)))
+	    description_text = campaign.description.replace("{{overview_url}}",overview_url)
 	    return render(request, 'campaigns/subscribe.html', {
-		'form': form,'campaign':campaign
+		'form': form,'campaign':campaign,'description_text':description_text
 		  })	    
 		  
 		  
 	#string = "this is %s" % type
 	#return HttpResponse(string)
 
-def emails(request,campaign_slug):
+def overview(request,campaign_slug):
 	DEADLINE = 'deadline'
 	FIXED = 'fixed'
 	RELATIVE = 'relative'
@@ -399,7 +405,7 @@ def emails(request,campaign_slug):
 			send_date = "%s %s before deadline at %s" % (months, days, email.send_time.strftime("%I:%M %p"))
 			formatted_emails.append({'subject':subject,'send_date':send_date,'content':body})
 		
-	return render(request, 'campaigns/emails.html', {
+	return render(request, 'campaigns/overview.html', {
 		'campaign': campaign,
 		'emails':formatted_emails,
 		})
@@ -429,7 +435,7 @@ def unsubscribe(request,subscriber_id,campaign_slug):
 				slug = subscription.subscription.slug
 				fromName = subscription.subscription.name
 
-		view_emails_here = request.build_absolute_uri(reverse('campaigns:emails', args=(slug,)))
+		overview_url = request.build_absolute_uri(reverse('campaigns:overview', args=(slug,)))
 		home_url = request.build_absolute_uri(reverse('campaigns:campaign', args=(campaign.slug,)))
 		logo_url = request.build_absolute_uri(staticfiles_storage.url("images/%s_logo.png" % campaign.slug))
 
@@ -441,7 +447,7 @@ def unsubscribe(request,subscriber_id,campaign_slug):
 				fromAddress,
 				{
 					"{{name}}":subscriber.name,
-					"{{view-emails}}":view_emails_here,
+					"{{overview_url}}":overview_url,
 					"{{HOME_URL}}":home_url,
 					"{{CAMPAIGN_NAME}}":campaign.name,
 					"{{LOGO_URL}}":logo_url,

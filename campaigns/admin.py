@@ -6,7 +6,7 @@ from django.db import models
 from django.contrib.contenttypes import generic
 
 class CampaignAdmin(admin.ModelAdmin):
-	readonly_fields=('slug','name','description','welcome_content')
+	readonly_fields=('slug','name','description','overview','welcome_content')
 	exclude=('welcome_subject','unsubscribe_subject','unsubscribe_content')
 
 	
@@ -28,7 +28,7 @@ class DeadlineOptionInline(admin.StackedInline):
 class DeadlineCampaignAdmin(admin.ModelAdmin):
 	fieldsets = (
 		(None, {
-			'fields' : ('slug','name','deadline_name','options_question','description','ontime_margin_in_weeks')
+			'fields' : ('slug','name','deadline_name','options_question','description','overview','ontime_margin_in_weeks')
 		}),
 		('Welcome Email (recieved when user subscribes)',{
 			'fields': ('welcome_subject','welcome_content'),
@@ -57,7 +57,7 @@ class FixedOptionInline(admin.StackedInline):
 class FixedCampaignAdmin(admin.ModelAdmin):
         fieldsets = (
                 (None, {
-                        'fields' : ('slug','name','options_question','description')
+                        'fields' : ('slug','name','options_question','description','overview')
                 }),
                 ('Welcome Email (recieved when user subscribes)',{
                         'fields': ('welcome_subject','welcome_content'),
@@ -84,7 +84,7 @@ class RelativeStartCampaignAdmin(admin.ModelAdmin):
 
 	fieldsets = (
                 (None, {
-                        'fields' : ('slug','name','description')
+                        'fields' : ('slug','name','description','overview')
                 }),
                 ('Welcome Email (recieved when user subscribes)',{
                         'fields': ('welcome_subject','welcome_content'),
