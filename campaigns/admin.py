@@ -28,7 +28,7 @@ class DeadlineOptionInline(admin.StackedInline):
 class DeadlineCampaignAdmin(admin.ModelAdmin):
 	fieldsets = (
 		(None, {
-			'fields' : ('slug','name','description','ontime_margin_in_weeks')
+			'fields' : ('slug','name','deadline_name','options_question','description','ontime_margin_in_weeks')
 		}),
 		('Welcome Email (recieved when user subscribes)',{
 			'fields': ('welcome_subject','welcome_content'),
@@ -57,7 +57,7 @@ class FixedOptionInline(admin.StackedInline):
 class FixedCampaignAdmin(admin.ModelAdmin):
         fieldsets = (
                 (None, {
-                        'fields' : ('slug','name','description')
+                        'fields' : ('slug','name','options_question','description')
                 }),
                 ('Welcome Email (recieved when user subscribes)',{
                         'fields': ('welcome_subject','welcome_content'),

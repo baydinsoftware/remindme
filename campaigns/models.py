@@ -32,7 +32,8 @@ class DeadlineCampaign(Campaign):
 
         after_welcome_subject = models.CharField(max_length=100,help_text='This email is sent in place of standard welcome if user subscribes some amount of time after first email would be sent as determine by ontime margin above')
 	after_welcome_content = HTMLField(help_text="You can use the following shortcodes: {{name}} {{view-emails}} {{deadline}} {{first-email}} {{unsubscribe}} {{months-away}} You can directly paste HTML entities such as: &squ;")
-
+	deadline_name = models.CharField(max_length=100,help_text='Name for deadline field on subscription page')
+	options_question = models.CharField(max_length=100,help_text='Question for options on subscription page',default="Which would you like to recieve reminders about?")
 	ontime_margin_in_weeks = models.IntegerField(help_text='Number of weeks before and after first email would be sent that is considered an "on time" start for which user recieves standard welcome email')
 
 class DeadlineOption(models.Model):
@@ -73,7 +74,7 @@ class RelativeStartEmail(Email):
 #######
 
 class FixedCampaign(Campaign):
-	pass
+	options_question = models.CharField(max_length=100,help_text='Question for options on subscription page',default="Which would you like to recieve reminders about?")
 
 class FixedOption(models.Model):
 	name = models.CharField(max_length=100)
