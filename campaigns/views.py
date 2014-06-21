@@ -17,6 +17,7 @@ from dateutil import rrule
 from itertools import chain
 from django.contrib.staticfiles.storage import staticfiles_storage
 from sendemail import send
+import re
 
 fromAddress = 'krista@baydin.com'
 
@@ -461,4 +462,134 @@ def unsubscribe(request,subscriber_id,campaign_slug):
 		return render(request, 'campaigns/unsubscribe_confirmation.html', {
 			  'subscriber': subscriber,
 			  'campaign':campaign,
+			  })
+
+def send_test(request,email_id,campaign_slug,email_address):
+	if not re.match(r"[^@]+@[^@]+\.[^@]+", email_address):
+		return HttpResponse("Not a valid email.")
+	else:
+
+		DEADLINE = 'deadline'
+		FIXED = 'fixed'
+		RELATIVE = 'relative'
+		try:
+			email = DeadlineEmail.objects.get(id=email_id)
+			type = DEADLINE
+		except(ObjectDoesNotExist):
+			try:
+				email = FixedEmail.objects.get(id=email_id)
+				type = FIXED
+			except(ObjectDoesNotExist):
+				email = Email.objects.get(id=email_id)
+				type = RELATIVE
+
+		if type == FIXED:
+			print email_address
+			unsubscribe_link = ""
+			slug = email.option.campaign.slug
+			overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(slug), reverse('campaigns:overview', args=(slug,)))
+			home_url = settings.CAMPAIGN_URL.get(slug)
+			logo_url = "%s/static/images/%s_logo.png" % (home_url,slug)
+			send(
+			email.subject,
+			email.content,
+			email_address,
+			email.option.campaign.name,
+			fromAddress,
+				{
+				"{{name}}":"Baydin",
+				"{{unsubscribe}}":unsubscribe_link,
+				"{{overview_url}}":overview_url,
+				"{{HOME_URL}}":settings.CAMPAIGN_URL.get(slug),
+				"{{CAMPAIGN_NAME}}":email.option.campaign.name,
+				"{{LOGO_URL}}":logo_url,
+				}
+			)
+			return render(request, 'campaigns/email.html', {
+				  'email': email,
+				  'campaign_slug':slug,
+				  'email_address':email_address,
+				  })
+
+		elif type == DEADLINE:
+			body = email.content_beginning
+			body += email.content_end
+
+			deadline_utc = datetime.now().strftime("%b %d, %Y")
+			slug = email.option.campaign.slug
+			unsubscribe_link = ""
+			overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(slug), reverse('campaigns:overview', args=(slug,)))
+			home_url = settings.CAMPAIGN_URL.get(slug)
+			logo_url = "%s/static/images/%s_logo.png" % (home_url, slug)
+			fromName = email.option.campaign.name
+			send(
+			email.subject,
+			body,
+			email_address,
+			fromName,
+			fromAddress,
+				{
+				"{{name}}":"Baydin",
+				"{{deadline}}":"XX/XX/XX'",
+				"{{unsubscribe}}":unsubscribe_link,
+				"{{overview_url}}":overview_url,
+				"{{HOME_URL}}":home_url,
+				"{{CAMPAIGN_NAME}}":email.option.campaign.name,
+				"{{LOGO_URL}}":logo_url,
+				}
+			)
+
+			return render(request, 'campaigns/email.html', {
+				  'email': email,
+				  'body':body,
+				  'campaign_slug':slug,
+				  'email_address':email_address,
+				  })
+		else:
+			return HttpResponse("Automatic tests for relative email unavailable. Alter times and try test subscriptions.")
+
+def send_test_addons(request,email_id,campaign_slug,email_address):
+	if not re.match(r"[^@]+@[^@]+\.[^@]+", email_address):
+		return HttpResponse("Not a valid email.")
+	else:
+		email = DeadlineEmail.objects.get(id=email_id)
+		options = DeadlineOption.objects.filter(campaign=email.option.campaign)
+		body = email.content_beginning
+		for option in options:
+			add_ons = DeadlineAddOn.objects.filter(email=email,option=option)
+			for add_on in add_ons:
+				body += add_on.content
+				body += """
+"""
+		body += email.content_end
+
+		deadline_utc = datetime.now().strftime("%b %d, %Y")
+		slug = email.option.campaign.slug
+		unsubscribe_link = ""
+		overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(slug), reverse('campaigns:overview', args=(slug,)))
+		home_url = settings.CAMPAIGN_URL.get(slug)
+		logo_url = "%s/static/images/%s_logo.png" % (home_url, slug)
+		fromName = email.option.campaign.name
+		send(
+		email.subject,
+		body,
+		email_address,
+		fromName,
+		fromAddress,
+			{
+			"{{name}}":"Baydin",
+			"{{deadline}}":"XX/XX/XX'",
+			"{{unsubscribe}}":unsubscribe_link,
+			"{{overview_url}}":overview_url,
+			"{{HOME_URL}}":home_url,
+			"{{CAMPAIGN_NAME}}":email.option.campaign.name,
+			"{{LOGO_URL}}":logo_url,
+			}
+		)
+
+		return render(request, 'campaigns/email.html', {
+			  'email': email,
+			  'body':body,
+			  'campaign_slug':slug,
+			  'email_address':email_address,
 			  })

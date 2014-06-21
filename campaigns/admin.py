@@ -17,11 +17,38 @@ class DeadlineAddonInline(admin.StackedInline):
 class DeadlineEmailAdmin(admin.ModelAdmin):
 	inlines = [DeadlineAddonInline]
 	list_filter = ('option',)
+	list_display = ['subject', 'option','my_url_field']
+	def my_url_field(self, obj):
+		
+		text = """
+		<script type="text/javascript">
+		<!--
+		function send_test(loc) {
+			var y=window.prompt("Please enter email for test")
+			href = loc.concat("../../../../campaigns/send_test/%s/")
+			window.location.href = href.concat(y);
+		}
+		function send_test_addons(loc) {
+			var y=window.prompt("Please enter email for test")
+			href = loc.concat("../../../../campaigns/send_test_addons/%s/")
+			window.location.href = href.concat(y);
+		}
+		//-->
+		</script>
+
+		
+
+		<a onclick="return send_test(this.href);">Send without add ons</a><br />
+		<a onclick="return send_test_addons(this.href);">Send with add ons</a> 	""" % (obj.id, obj.id)
+		return text
+		#return '<a href="%s%s">%s</a>' % ('http://url-to-prepend.com/', obj.subject, obj.subject)
+	my_url_field.allow_tags = True
+	my_url_field.short_description = 'Send Test Email'
 
 class DeadlineOptionInline(admin.StackedInline):
         verbose_name = 'Options (make at least one required!)'
 	model = DeadlineOption
-        extra = 1
+        extra = 2
 	#readonly_fields=('send_time','subject','content_beginning','content_end',)
 	#max_num=0
 
@@ -52,7 +79,7 @@ class DeadlineCampaignAdmin(admin.ModelAdmin):
 class FixedOptionInline(admin.StackedInline):
         verbose_name = 'Options'
         model = FixedOption
-        extra = 1
+        extra = 2
 	
 class FixedCampaignAdmin(admin.ModelAdmin):
         fieldsets = (
@@ -72,7 +99,24 @@ class FixedCampaignAdmin(admin.ModelAdmin):
 
 class FixedEmailAdmin(admin.ModelAdmin):
 	readonly_fields = ('email_sent',)	
-#	pass
+	list_display = ['subject', 'option','my_url_field']
+	def my_url_field(self, obj):
+		
+		text = """
+		<script type="text/javascript">
+		<!--
+		function send_test(loc) {
+			var y=window.prompt("Please enter email for test")
+			href = loc.concat("../../../../campaigns/send_test/%s/")
+			window.location.href = href.concat(y);
+		}
+		//-->
+		</script>
+		<a onclick="return send_test(this.href);">Click</a> 	""" % (obj.id)
+		return text
+		#return '<a href="%s%s">%s</a>' % ('http://url-to-prepend.com/', obj.subject, obj.subject)
+	my_url_field.allow_tags = True
+	my_url_field.short_description = 'Send Test Email'
 
 class RelativeStartEmailInline(admin.StackedInline):
 	model = RelativeStartEmail
