@@ -133,11 +133,11 @@ def campaign(request,campaign_slug):
 			  'subscriber': subscriber,'campaign':campaign
 			  })
 
-		overview_url =  request.build_absolute_uri(reverse('campaigns:overview', args=(campaign.slug,)))
-		description_text = campaign.description.replace("{{overview_url}}",overview_url)
-		return render(request, 'campaigns/subscribe.html', {
-		'form': form,'campaign':campaign,'description_text':description_text
-		  })
+	    overview_url =  request.build_absolute_uri(reverse('campaigns:overview', args=(campaign.slug,)))
+	    description_text = campaign.description.replace("{{overview_url}}",overview_url)
+	    return render(request, 'campaigns/subscribe.html', {
+	    'form': form,'campaign':campaign,'description_text':description_text
+	      })
 		
 	elif type == DEADLINE:
 		if request.method == 'GET':
