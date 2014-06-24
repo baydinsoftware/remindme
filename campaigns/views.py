@@ -52,11 +52,7 @@ def campaign(request,campaign_slug):
 	if type == RELATIVE:
 	    if request.method == 'GET':
 		form = RelativeStartForm()
-		overview_url =  request.build_absolute_uri(reverse('campaigns:overview', args=(campaign.slug,)))
-		description_text = campaign.description.replace("{{overview_url}}",overview_url)
-		return render(request, 'campaigns/subscribe.html', {
-		'form': form,'campaign':campaign,'description_text':description_text
-		  })
+		
 	    else:
 		# A POST request: Handle Form Upload
 		form = RelativeStartForm(request.POST) # Bind data from request.POST into a PostForm
@@ -137,15 +133,15 @@ def campaign(request,campaign_slug):
 			  'subscriber': subscriber,'campaign':campaign
 			  })
 
-	    
+		overview_url =  request.build_absolute_uri(reverse('campaigns:overview', args=(campaign.slug,)))
+		description_text = campaign.description.replace("{{overview_url}}",overview_url)
+		return render(request, 'campaigns/subscribe.html', {
+		'form': form,'campaign':campaign,'description_text':description_text
+		  })
+		
 	elif type == DEADLINE:
 		if request.method == 'GET':
 			form = DeadlineForm(campaign=campaign)
-			overview_url =  request.build_absolute_uri(reverse('campaigns:overview', args=(campaign.slug,)))
-			description_text = campaign.description.replace("{{overview_url}}",overview_url)
-			return render(request, 'campaigns/subscribe.html', {
-				'form': form,'campaign':campaign,'description_text':description_text
-			})	    
 		else:
 			# A POST request: Handle Form Upload
 			form = DeadlineForm(request.POST,campaign=campaign) # Bind data from request.POST into a PostForm
@@ -250,10 +246,14 @@ def campaign(request,campaign_slug):
 					}
 				)
 
-		return render(request, 'campaigns/thanks.html', {
-			'subscriber': subscriber,'campaign':campaign
-		})	    
-
+				return render(request, 'campaigns/thanks.html', {
+					'subscriber': subscriber,'campaign':campaign
+				})	    
+		overview_url =  request.build_absolute_uri(reverse('campaigns:overview', args=(campaign.slug,)))
+		description_text = campaign.description.replace("{{overview_url}}",overview_url)
+		return render(request, 'campaigns/subscribe.html', {
+		'form': form,'campaign':campaign,'description_text':description_text
+		  })
 	elif type == FIXED:
 	    if request.method == 'GET':
 		form = FixedForm(campaign=campaign)
