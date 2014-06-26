@@ -4,6 +4,20 @@ from django.core.exceptions import ValidationError
 from campaigns.models import *
 from django.forms.extras.widgets import SelectDateWidget
 
+class CreateForm(ModelForm):
+	
+	start= forms.DateField(initial=datetime.date.today,widget=SelectDateWidget)
+	end = forms.DateField(initial=datetime.date.today,widget=SelectDateWidget)
+	time = forms.TimeField(widget=forms.TimeInput(format='%H:%M'))
+	choices  = forms.ChoiceField(choices = ([('monthly','monthly'), ('yearly','yearly'), ]))
+	class Meta:
+		model = FixedEmail
+		fields = ['subject','content','option','start','end','time','choices']
+
+
+        def __init__(self, *args, **kwargs):
+                super(CreateForm, self).__init__(*args, **kwargs)
+	
 class RelativeStartForm(ModelForm):
 	confirm_email = forms.EmailField(
 		label="Confirm email",
@@ -144,13 +158,13 @@ class OptionsWidget(forms.widgets.SelectMultiple):
 
                   if isinstance(v, bool):
                       rendered_fields.append(
-                          '<td class="%s"><span class="%s">%s</span></td>' % (
+                          '<td class="%s"><label><span class="%s">%s</span></label></td>' % (
                               f, str(v).lower(), str(v).lower() )
                        )
 
                   else:
                       rendered_fields.append(
-                          '<td class="%s">%s</td>' % (f, v))
+                          '<td class="%s"><label>%s</label></td>' % (f, v))
 
               except AttributeError:
                   rendered_fields.append(

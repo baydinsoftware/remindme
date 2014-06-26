@@ -1,0 +1,42 @@
+body 
+{
+	background: #FFF;
+	color: #4A4A4A;
+
+}
+
+#form, .emails {
+	background: #EFEFEF;
+
+}
+
+input[type=submit] {
+	background: #1B75BC;
+
+}
+
+input[type=email], input[type=text] {
+	border: 0px solid #DDD;
+	background: #FFF;
+
+}
+
+#footer{
+  background: #1B75BC;
+}
+
+a:link, a:visited, a:active {
+	color: #4A4A4A;
+}
+a:hover {
+	color: #1B75BC;
+}
+#footer a:link, #footer a:visited, #footer a:active{
+	color: #FFF;
+}
+#footer a:hover {
+	color:#DFDFDF;
+}
+.errorlist {
+	color: #1B75BC;
+}

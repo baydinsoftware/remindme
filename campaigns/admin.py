@@ -17,18 +17,18 @@ class DeadlineAddonInline(admin.StackedInline):
 class DeadlineEmailAdmin(admin.ModelAdmin):
 	inlines = [DeadlineAddonInline]
 	list_filter = ('option',)
-	list_display = ['subject', 'option','my_url_field']
+	list_display = ['subject', 'option','delta_months','delta_days','my_url_field']
 	def my_url_field(self, obj):
 		
 		text = """
 		<script type="text/javascript">
 		<!--
-		function send_test(loc) {
+		function send_test_%s(loc) {
 			var y=window.prompt("Please enter email for test")
 			href = loc.concat("../../../../campaigns/send_test/%s/")
 			window.location.href = href.concat(y);
 		}
-		function send_test_addons(loc) {
+		function send_test_addons_%s(loc) {
 			var y=window.prompt("Please enter email for test")
 			href = loc.concat("../../../../campaigns/send_test_addons/%s/")
 			window.location.href = href.concat(y);
@@ -38,8 +38,8 @@ class DeadlineEmailAdmin(admin.ModelAdmin):
 
 		
 
-		<a onclick="return send_test(this.href);">Send without add ons</a><br />
-		<a onclick="return send_test_addons(this.href);">Send with add ons</a> 	""" % (obj.id, obj.id)
+		<a onclick="return send_test_%s(this.href);">Send without add ons</a><br />
+		<a onclick="return send_test_addons_%s(this.href);">Send with add ons</a> 	""" % (obj.id, obj.id,obj.id,obj.id,obj.id,obj.id)
 		return text
 		#return '<a href="%s%s">%s</a>' % ('http://url-to-prepend.com/', obj.subject, obj.subject)
 	my_url_field.allow_tags = True
@@ -98,21 +98,33 @@ class FixedCampaignAdmin(admin.ModelAdmin):
 	inlines = [FixedOptionInline]
 
 class FixedEmailAdmin(admin.ModelAdmin):
+	def render_change_form(self, request, context, *args, **kwargs):
+        	# here we define a custom template
+        	self.change_form_template = "campaigns/admin/change_form_help_text.html"
+        	extra = {
+   	    	    'help_text': "ADD MULTIPLE RECURSIVE EMAILS HERE: http://www.mytaxreminders.com/admin/recursive_fixed"
+        	}
+
+        	context.update(extra)
+        	return super(FixedEmailAdmin, self).render_change_form(request,
+            	context, *args, **kwargs)
+
 	readonly_fields = ('email_sent',)	
-	list_display = ['subject', 'option','my_url_field']
+	list_filter = ('option',)
+	list_display = ['subject', 'option','send_date','my_url_field']
 	def my_url_field(self, obj):
 		
 		text = """
 		<script type="text/javascript">
 		<!--
-		function send_test(loc) {
+		function send_test_%s(loc) {
 			var y=window.prompt("Please enter email for test")
 			href = loc.concat("../../../../campaigns/send_test/%s/")
 			window.location.href = href.concat(y);
-		}
+		#}
 		//-->
 		</script>
-		<a onclick="return send_test(this.href);">Click</a> 	""" % (obj.id)
+		<a onclick="return send_test_%s(this.href);">Click</a> 	""" % (obj.id,obj.id,obj.id)
 		return text
 		#return '<a href="%s%s">%s</a>' % ('http://url-to-prepend.com/', obj.subject, obj.subject)
 	my_url_field.allow_tags = True
@@ -167,7 +179,7 @@ class EmailQueueAdmin(admin.ModelAdmin):
 	readonly_fields = ('subscription','email_sent','email')	
 	fields=('send_date','subscription','email','email_sent')
 
-admin.site.register(Campaign,CampaignAdmin)
+#admin.site.register(Campaign,CampaignAdmin)
 admin.site.register(FixedCampaign,FixedCampaignAdmin)
 admin.site.register(DeadlineCampaign,DeadlineCampaignAdmin)
 admin.site.register(DeadlineEmail,DeadlineEmailAdmin)

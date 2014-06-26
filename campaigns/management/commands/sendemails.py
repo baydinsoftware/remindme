@@ -3,7 +3,7 @@ from django.core.management.base import NoArgsCommand
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from campaigns.models import FixedEmail, Subscription,EmailQueue,DeadlineCampaign,DeadlineOption,DeadlineAddOn
-from datetime import datetime
+from datetime import datetime,timedelta
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from remindme import settings
@@ -37,6 +37,11 @@ class Command(NoArgsCommand):
 
 				unsubscribe_link = "%s/%s/unsubscribe/%s" % (settings.CAMPAIGN_URL.get(option.campaign.slug), option.campaign.slug, subscription.subscriber.id)
 				fromName = option.campaign.name
+				current_year = datetime.now().year
+				next_year = str(current_year + 1)
+				last_year = str(current_year - 1)
+				week = datetime.now() + timedelta(days=7)
+				fourdays = datetime.now() + timedelta(days=4)
 				send(
 				mail.subject,
 				mail.content,
@@ -50,6 +55,11 @@ class Command(NoArgsCommand):
 					"{{HOME_URL}}":settings.CAMPAIGN_URL.get(option.campaign.slug),
 					"{{CAMPAIGN_NAME}}":option.campaign.name,
 					"{{LOGO_URL}}":logo_url,
+					"{{year}}":str(current_year),
+					"{{year+}}":next_year,
+					"{{year-}}":last_year,
+					"{{week+}}":week.strftime("%A, %B %e"),
+					"{{four_days}}":fourdays.strftime("%A, %B %e"),
 					}
 				)
 

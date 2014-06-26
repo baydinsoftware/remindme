@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+{% load static  %}
+
+<head>
+	<link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css">
+	<link href="{{ STATIC_URL}}css/{{ campaign.slug }}_colors.css" rel="stylesheet" type="text/css">
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js">
+	</script>
+    <title>{{ campaign.name }}</title>
+</head>
+<body>
+
+	<div id='logo'>
+		<a href="{% url 'campaigns:campaign' campaign.slug %}">
+			<img src="{{ STATIC_URL}}images/{{ campaign.slug }}_logo.png" />
+		</a>
+	</div>
+	<h1>Mass Recursive Email Adder</h1>
+	<div class='text'>
+		This interface can be used to add emails on a mass scale iterated over certain periods.  Copy paste HTML content from admin side editor.
+	</div>
+	<!--
+	<p class="centered">
+		<a href="{% url 'campaigns:overview' campaign.slug %}">What emails will I be recieving?</a>
+	</p>
+	-->
+	<div id ="form">
+		<form action="" method='post'>{% csrf_token %}
+		Subject:<br />{{ form.subject }}<br />
+		{{ form.subject.errors }}<br />
+	 	Content:<br />
+		(this should be HTML- use the little button in the admin side editor and paste those HTML goodies here!)<br />
+		{{ form.content }}<br />
+		{{ form.content.errors }}<br />
+		Option:<br />{{ form.option }}<br />
+		{{ form.option.errors }}<br />
+		Start Day:<br />{{ form.start }}<br />
+                {{ form.start.errors }}<br />
+		Start End:<br />{{ form.end }}<br />
+                {{ form.end.errors }}<br />
+	 	Iteration Rate:<br />{{ form.choices }}<br />
+                {{ form.choices.errors }}<br />
+		Send Time (HH:MM format in UTC):<br />{{ form.time }}<br />
+                {{ form.time.errors }}<br />
+
+		<input type='submit' value='Add!' />
+		</form>
+	</div>
+	<div id="footer">
+		Brought to you by the makers of <a href="http://www.boomeranggmail.com/">Boomerang for Gmail</a>, <a href="http://boomerangcalendar.com/">Boomerang Calendar</a>, <a href="http://inboxpause.com">Inbox Pause</a>, <a href="http://www.boomeranggmail.com/android/">Boomerang for Android</a> and <a href="http://www.baydin.com/boomerang/">Boomerang for Outlook</a>
+	</div>
+</body>
+</html>

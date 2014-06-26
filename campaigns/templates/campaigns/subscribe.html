@@ -1,13 +1,11 @@
 <!DOCTYPE html>
-
+<html>
 {% load static  %}
 
 <head>
 	<link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css">
 	<link href="{{ STATIC_URL}}css/{{ campaign.slug }}_colors.css" rel="stylesheet" type="text/css">
-	<script src="http://cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js">
-	</script>
-    <title>{{ campaign.name }}</title>
+    	<title>{{ campaign.name }}</title>
 </head>
 <body>
 
@@ -29,7 +27,7 @@
 		{% if form.name %}
 	            <div class='field'>
 	            <div class="label">
-	            First Name:
+	            <label for="id_name">First Name:</label>
 	            </div>{{ form.name }}
 	            {{ form.name.errors }}
 	            </div>
@@ -66,19 +64,20 @@
 			{% endif %}
 		{% endif %}
 		</div>
-
-		<script>
-			var tz = jstz.determine(); // Determines the time zone of the browser client
-			document.write('<input type="hidden" name="timezone" value="');
-			document.write(tz.name());
-			document.write('">');
-		</script>
-
+		<input type="hidden" name="timezone" id="timezone">
 		<input type='submit' value='Sign me up!' />
 		</form>
 	</div>
 
 	<div id="footer">
-		Brought to you by the makers of Boomerang for Gmail, Boomerang Calendar, Inbox Pause, Boomerang for Android, Boomerang for Outlook and whatever else we make.
+		Brought to you by the makers of <a href="http://www.boomeranggmail.com/">Boomerang for Gmail</a>, <a href="http://boomerangcalendar.com/">Boomerang Calendar</a>, <a href="http://inboxpause.com">Inbox Pause</a>, <a href="http://www.boomeranggmail.com/android/">Boomerang for Android</a> and <a href="http://www.baydin.com/boomerang/">Boomerang for Outlook</a>
 	</div>
 </body>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/jstimezonedetect/1.0.4/jstz.min.js">
+</script>
+<script type="text/javascript">
+window.onload = function(){
+	document.getElementById("timezone").value = jstz.determine().name();  
+}
+</script>
+</html>
