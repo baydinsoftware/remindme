@@ -88,7 +88,7 @@ class FixedEmail(Email):
 	send_date = models.DateTimeField(help_text="This date/time is in UTC. Emails to all subscribers will be sent at this time UTC regardless of your or the subscribers' time zone. UTC is 8hr ahead of CA (7hr during Summer Day Light Savings).")
 	content = HTMLField(help_text="You can use the following shortcodes: {{name}} {{unsubscribe}} {{overview_url}} {{year}} {{year+}} {{year-}} {{week+}} {{four_days}}. You can directly paste HTML entities such as: &squ;")
 	option = models.ForeignKey(FixedOption, help_text='This email will be sent to users subscribed to this option.')
-	email_sent = models.BooleanField(default=False, help_text="This is automatically set to true when this email has been sent to all subscribers.")
+	email_sent = models.BooleanField(default=False, help_text="!!!!!!! An unchecked email will automatically be sent on its send date- if that date is in the past it will send immediately to all subscribers!!! Uncheck this box with caution!!!! Double-check your send date!" )
 
 #######
 

@@ -109,7 +109,7 @@ class FixedEmailAdmin(admin.ModelAdmin):
         	return super(FixedEmailAdmin, self).render_change_form(request,
             	context, *args, **kwargs)
 
-	readonly_fields = ('email_sent',)	
+	#readonly_fields = ('email_sent',)	
 	list_filter = ('option',)
 	list_display = ['subject', 'option','send_date','my_url_field']
 	def my_url_field(self, obj):
