@@ -18,8 +18,6 @@ class Command(NoArgsCommand):
 
 	def handle_noargs(self, **options):
 		now = datetime.utcnow().replace(tzinfo=tz.gettz('UTC'))
-		fromName = "Krista's Reminders"
-		fromAddress = 'krista@baydin.com'
 
 		##Send appropriate FixedEmails
 		mails = FixedEmail.objects.filter(send_date__lt=now,email_sent=False)	
@@ -31,8 +29,9 @@ class Command(NoArgsCommand):
 				content_type=ContentType.objects.get_for_model(option)
 			)
 			overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(option.campaign.slug), reverse('campaigns:overview', args=(option.campaign.slug,)))
+			fromAddress = settings.CAMPAIGN_FROM_ADDRESS.get(option.campaign.slug)
 			home_url = settings.CAMPAIGN_URL.get(option.campaign.slug)
-			logo_url = "%s/static/images/%s_logo.png" % (home_url,option.campaign.slug)
+			logo_url = "%s/static/images/%s_email_logo.png" % (home_url,option.campaign.slug)
 			for subscription in subscriptions:
 
 				unsubscribe_link = "%s/%s/unsubscribe/%s" % (settings.CAMPAIGN_URL.get(option.campaign.slug), option.campaign.slug, subscription.subscriber.id)
@@ -90,10 +89,11 @@ class Command(NoArgsCommand):
 
 				deadline_utc = email_on_queue.subscription.subscriber.deadline.strftime("%b %d, %Y")
 				slug = email_on_queue.subscription.subscription.campaign.slug
+				fromAddress = settings.CAMPAIGN_FROM_ADDRESS.get(slug)
 				unsubscribe_link = "%s/%s/unsubscribe/%s" % (settings.CAMPAIGN_URL.get(slug), slug, subscription.subscriber.id)
 				overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(slug), reverse('campaigns:overview', args=(slug,)))
 				home_url = settings.CAMPAIGN_URL.get(slug)
-				logo_url = "%s/static/images/%s_logo.png" % (home_url, slug)
+				logo_url = "%s/static/images/%s_email_logo.png" % (home_url, slug)
 				fromName = email_on_queue.subscription.subscription.campaign.name
 				send(
 				email_on_queue.email.subject,
@@ -118,10 +118,11 @@ class Command(NoArgsCommand):
 				#For Relative Start Emails
 
 				slug = email_on_queue.subscription.subscription.slug
+				fromAddress = settings.CAMPAIGN_FROM_ADDRESS.get(slug)
 				unsubscribe_link = "%s/%s/unsubscribe/%s" % (settings.CAMPAIGN_URL.get(slug), slug, email_on_queue.subscription.subscriber.id)
 				overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(slug), reverse('campaigns:overview', args=(slug,)))
 				home_url = settings.CAMPAIGN_URL.get(slug)
-				logo_url = "%s/static/images/%s_logo.png" % (home_url, slug)
+				logo_url = "%s/static/images/%s_email_logo.png" % (home_url, slug)
 				fromName = email_on_queue.subscription.subscription.name
 				send(
 				email_on_queue.email.subject,

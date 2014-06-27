@@ -28,19 +28,20 @@ class DeadlineEmailAdmin(admin.ModelAdmin):
 			href = loc.concat("../../../../campaigns/send_test/%s/")
 			window.location.href = href.concat(y);
 		}
-		function send_test_addons_%s(loc) {
-			var y=window.prompt("Please enter email for test")
-			href = loc.concat("../../../../campaigns/send_test_addons/%s/")
-			window.location.href = href.concat(y);
-		}
-		//-->
-		</script>
+                function send_test_addons_%s(loc) {
+                        var y=window.prompt("Please enter email for test")
+                        href = loc.concat("../../../../campaigns/send_test_addons/%s/")
+                        window.location.href = href.concat(y);
+                }
+                //-->
+                </script>
 
-		
+                
 
-		<a onclick="return send_test_%s(this.href);">Send without add ons</a><br />
-		<a onclick="return send_test_addons_%s(this.href);">Send with add ons</a> 	""" % (obj.id, obj.id,obj.id,obj.id,obj.id,obj.id)
-		return text
+                <a onclick="return send_test_%s(this.href);">Send without add ons</a><br />
+                <a onclick="return send_test_addons_%s(this.href);">Send with add ons</a>       """ % (obj.id, obj.id,obj.id,obj.id,obj.id,obj.id)
+                return text
+
 		#return '<a href="%s%s">%s</a>' % ('http://url-to-prepend.com/', obj.subject, obj.subject)
 	my_url_field.allow_tags = True
 	my_url_field.short_description = 'Send Test Email'
@@ -113,20 +114,21 @@ class FixedEmailAdmin(admin.ModelAdmin):
 	list_filter = ('option',)
 	list_display = ['subject', 'option','send_date','my_url_field']
 	def my_url_field(self, obj):
-		
-		text = """
-		<script type="text/javascript">
-		<!--
-		function send_test_%s(loc) {
-			var y=window.prompt("Please enter email for test")
-			href = loc.concat("../../../../campaigns/send_test/%s/")
-			window.location.href = href.concat(y);
-		#}
-		//-->
-		</script>
-		<a onclick="return send_test_%s(this.href);">Click</a> 	""" % (obj.id,obj.id,obj.id)
-		return text
-		#return '<a href="%s%s">%s</a>' % ('http://url-to-prepend.com/', obj.subject, obj.subject)
+
+                text = """
+                <script type="text/javascript">
+                <!--
+                function send_test_%s(loc) {
+                        var y=window.prompt("Please enter email for test")
+                        href = loc.concat("../../../../campaigns/send_test/%s/")
+                        window.location.href = href.concat(y);
+                }
+                //-->
+                </script>
+                <a onclick="return send_test_%s(this.href);">Send test</a>       """ % (obj.id,obj.id,obj.id)
+                return text
+
+
 	my_url_field.allow_tags = True
 	my_url_field.short_description = 'Send Test Email'
 

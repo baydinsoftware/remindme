@@ -20,7 +20,6 @@ from sendemail import send
 import re
 from django.shortcuts import redirect
 
-fromAddress = 'krista@baydin.com'
 
 def index(request):
   
@@ -74,8 +73,9 @@ def campaign(request,campaign_slug):
 			unsubscribe_link = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),reverse('campaigns:unsubscribe', args=(campaign.slug,subscriber.id,)))
 			overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),reverse('campaigns:overview', args=(campaign.slug,)))
 			home_url = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),reverse('campaigns:campaign', args=(campaign.slug,)))
-			logo_url = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),staticfiles_storage.url("images/%s_logo.png" % campaign.slug))
+			logo_url = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),staticfiles_storage.url("images/%s_email_logo.png" % campaign.slug))
 			fromName = campaign.name
+			fromAddress = settings.CAMPAIGN_FROM_ADDRESS.get(campaign.slug)
 			send(
 				campaign.welcome_subject,
 				campaign.welcome_content,
@@ -228,9 +228,9 @@ def campaign(request,campaign_slug):
 				unsubscribe_link = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),reverse('campaigns:unsubscribe', args=(campaign.slug,subscriber.id,)))
 				overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),reverse('campaigns:overview', args=(campaign.slug,)))
 				home_url = settings.CAMPAIGN_URL.get(campaign.slug)
-				logo_url = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),staticfiles_storage.url("images/%s_logo.png" % campaign.slug))
+				logo_url = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),staticfiles_storage.url("images/%s_email_logo.png" % campaign.slug))
 				fromName = campaign.name 
-				
+				fromAddress = settings.CAMPAIGN_FROM_ADDRESS.get(campaign.slug)
 				send(
 					subject,
 					body,
@@ -288,8 +288,9 @@ def campaign(request,campaign_slug):
 		    overview_url =  "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),reverse('campaigns:overview', args=(campaign.slug,)))
 
 		    home_url = settings.CAMPAIGN_URL.get(campaign.slug)
-		    logo_url = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),staticfiles_storage.url("images/%s_logo.png" % campaign.slug))
+		    logo_url = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),staticfiles_storage.url("images/%s_email_logo.png" % campaign.slug))
 		    fromName = campaign.name
+		    fromAddress = settings.CAMPAIGN_FROM_ADDRESS.get(campaign.slug)
 		    current_year = datetime.now().year
 		    next_year = str(current_year + 1)
 		    last_year = str(current_year - 1)
@@ -453,8 +454,9 @@ def unsubscribe(request,subscriber_id,campaign_slug):
 
 		overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),reverse('campaigns:overview', args=(slug,)))
 		home_url = settings.CAMPAIGN_URL.get(campaign.slug)
-		logo_url = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),staticfiles_storage.url("images/%s_logo.png" % campaign.slug))
-
+		logo_url = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),staticfiles_storage.url("images/%s_email_logo.png" % campaign.slug))
+		fromName = campaign.name
+		fromAddress = settings.CAMPAIGN_FROM_ADDRESS.get(campaign.slug)
 		send(
 				subject,
 				body,
@@ -504,12 +506,14 @@ def send_test(request,email_id,email_address):
 			slug = email.option.campaign.slug
 			overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(slug), reverse('campaigns:overview', args=(slug,)))
 			home_url = settings.CAMPAIGN_URL.get(slug)
-			logo_url = "%s/static/images/%s_logo.png" % (home_url,slug)
+			logo_url = "%s/static/images/%s_email_logo.png" % (home_url,slug)
 			current_year = datetime.now().year
 			next_year = str(current_year + 1)
 			last_year = str(current_year - 1)
 			week = datetime.now() + timedelta(days=7)
 			fourdays = datetime.now() + timedelta(days=4)
+			fromName = email.option.campaign.name
+			fromAddress = settings.CAMPAIGN_FROM_ADDRESS.get(slug)
 			send(
 			email.subject,
 			email.content,
@@ -545,8 +549,9 @@ def send_test(request,email_id,email_address):
 			unsubscribe_link = ""
 			overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(slug), reverse('campaigns:overview', args=(slug,)))
 			home_url = settings.CAMPAIGN_URL.get(slug)
-			logo_url = "%s/static/images/%s_logo.png" % (home_url, slug)
+			logo_url = "%s/static/images/%s_email_logo.png" % (home_url, slug)
 			fromName = email.option.campaign.name
+			fromAddress = settings.CAMPAIGN_FROM_ADDRESS.get(slug)
 			send(
 			email.subject,
 			body,
@@ -593,8 +598,9 @@ def send_test_addons(request,email_id,email_address):
 		unsubscribe_link = ""
 		overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(slug), reverse('campaigns:overview', args=(slug,)))
 		home_url = settings.CAMPAIGN_URL.get(slug)
-		logo_url = "%s/static/images/%s_logo.png" % (home_url, slug)
+		logo_url = "%s/static/images/%s_email_logo.png" % (home_url, slug)
 		fromName = email.option.campaign.name
+		fromAddress = settings.CAMPAIGN_FROM_ADDRESS.get(slug)
 		send(
 		email.subject,
 		body,
