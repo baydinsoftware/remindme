@@ -126,3 +126,21 @@ class EmailQueue(models.Model):
 		return "%s (%s) send to %s on %s UTC" % (self.email.subject,
 			  self.subscription.subscription,self.subscription.subscriber,
 			  self.send_date.strftime("%b %d, %Y %H:%M"))
+######
+
+
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
+
+@receiver(pre_delete, sender=RelativeStartEmail, dispatch_uid='relativestartemail_delete_signal')
+def log_deleted_question(sender, instance, using, **kwargs):
+    queues = EmailQueue.objects.filter(object_id=instance.id)
+    for queue in queues:
+	queue.delete()
+
+@receiver(pre_delete, sender=DeadlineEmail, dispatch_uid='deadlineemail_delete_signal')
+def log_deleted_question(sender, instance, using, **kwargs):
+    queues = EmailQueue.objects.filter(object_id=instance.id)
+    for queue in queues:
+        queue.delete()
+
