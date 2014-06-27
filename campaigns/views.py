@@ -560,7 +560,7 @@ def send_test(request,email_id,email_address):
 			fromAddress,
 				{
 				"{{name}}":"Baydin",
-				"{{deadline}}":"XX/XX/XX'",
+				"{{deadline}}":"Jan 01, 2001",
 				"{{unsubscribe}}":unsubscribe_link,
 				"{{overview_url}}":overview_url,
 				"{{HOME_URL}}":home_url,
