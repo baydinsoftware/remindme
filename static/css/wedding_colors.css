@@ -44,3 +44,7 @@ a:hover {
 .errorlist {
 	color: #FF0066;
 }
+
+.text ul {
+	list-style-image: url(../images/square.png);
+}

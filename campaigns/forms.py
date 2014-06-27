@@ -47,7 +47,7 @@ class RelativeStartForm(ModelForm):
 class DeadlineForm(ModelForm):
 
 	confirm_email = forms.EmailField(
-		label = "Confirm Email",
+		label = "Confirm email",
 		required = True,
 	)
 
@@ -80,7 +80,7 @@ class DeadlineForm(ModelForm):
 class FixedForm(ModelForm):
 
 	confirm_email = forms.EmailField(
-                label = "Confirm Email",
+                label = "Confirm email",
                 required = True,
         )
 
