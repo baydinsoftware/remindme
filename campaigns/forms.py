@@ -125,6 +125,7 @@ class OptionsWidget(forms.widgets.SelectMultiple):
       has_id = attrs and 'id' in attrs
       final_attrs = self.build_attrs(attrs, name=name)
       output = []
+      id_number = 0
       # Normalize to strings
       str_values = set([force_unicode(v) for v in value])
       for i, (option_value, option_label) in enumerate(chain(self.choices,
@@ -164,8 +165,8 @@ class OptionsWidget(forms.widgets.SelectMultiple):
 
                   else:
                       rendered_fields.append(
-                          '<td class="%s"><label>%s</label></td>' % (f, v))
-
+                          '<td class="%s"><label for="id_options_%s">%s</label></td>' % (f, id_number,v))
+		      id_number = id_number + 1
               except AttributeError:
                   rendered_fields.append(
                       '<td class="%s">None</td>' % f)
