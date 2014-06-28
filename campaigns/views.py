@@ -176,7 +176,8 @@ def campaign(request,campaign_slug):
 				after_date = now_utc + relativedelta(weeks=campaign.ontime_margin_in_weeks)
 
 				first_email = deadline_local #we're going to store the earliest email this subscriber would get to calculate appropriate welcome
-				first_email_sent = deadline_local
+				first_email_id = -2
+				first_email_sent = deadline_utc
 				first_email_months = str(0);
 				for option in all_options:
 					subscription = Subscription.objects.create(subscriber=subscriber,
@@ -202,21 +203,22 @@ def campaign(request,campaign_slug):
 						#if this intended send time is earlier than current earliest, save
 						if first_email > send_date_utc:
 							first_email = send_date_utc
-							if send_date_utc > after_date:
-								first_email_sent = send_date_utc
-								first_email_months = str(email.delta_months)
+							first_email_id = email.id
 						#only add to queue if its send date has yet to happen
-						if send_date_utc > after_date:
+						if send_date_utc > now_utc:
 							queue = EmailQueue.objects.create(send_date=send_date_utc,subscription=subscription,email=email)
-							
+						if first_email_sent > send_date_utc and send_date_utc > now_utc:
+							first_email_sent = send_date_utc
+							first_email_months = str(email.delta_months)
 				months_away = 0
 				for r in rrule.rrule(rrule.MONTHLY, bymonthday=(deadline_utc.day, -1), bysetpos=1, dtstart=now_utc, until=deadline_utc):
 					months_away += 1
-
+		
 			    ###Send Appropriate Welcome Email
 				if after_date > first_email and before_date < first_email:
 					subject = campaign.welcome_subject
 					body = campaign.welcome_content
+					EmailQueue.objects.filter(subscription=subscription,object_id=first_email_id).delete()		
 				elif after_date > first_email:
 					subject = campaign.after_welcome_subject
 					body = campaign.after_welcome_content
