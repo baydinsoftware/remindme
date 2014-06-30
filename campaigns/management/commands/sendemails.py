@@ -34,7 +34,7 @@ class Command(NoArgsCommand):
 			logo_url = "%s/static/images/%s_email_logo.png" % (home_url,option.campaign.slug)
 			for subscription in subscriptions:
 
-				unsubscribe_link = "%s/%s/unsubscribe/%s" % (settings.CAMPAIGN_URL.get(option.campaign.slug), option.campaign.slug, subscription.subscriber.id)
+				unsubscribe_link = "%s/%s/unsubscribe/%s/%s" % (settings.CAMPAIGN_URL.get(option.campaign.slug), option.campaign.slug, subscription.subscriber.id,subscription.subscriber.email_address)
 				fromName = option.campaign.name
 				current_year = datetime.now().year
 				next_year = str(current_year + 1)
@@ -90,7 +90,7 @@ class Command(NoArgsCommand):
 				deadline_utc = email_on_queue.subscription.subscriber.deadline.strftime("%b %d, %Y")
 				slug = email_on_queue.subscription.subscription.campaign.slug
 				fromAddress = settings.CAMPAIGN_FROM_ADDRESS.get(slug)
-				unsubscribe_link = "%s/%s/unsubscribe/%s" % (settings.CAMPAIGN_URL.get(slug), slug, subscription.subscriber.id)
+				unsubscribe_link = "%s/%s/unsubscribe/%s/%s" % (settings.CAMPAIGN_URL.get(slug), slug, subscription.subscriber.id,subscription.subscriber.email_address)
 				overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(slug), reverse('campaigns:overview', args=(slug,)))
 				home_url = settings.CAMPAIGN_URL.get(slug)
 				logo_url = "%s/static/images/%s_email_logo.png" % (home_url, slug)
@@ -119,7 +119,7 @@ class Command(NoArgsCommand):
 
 				slug = email_on_queue.subscription.subscription.slug
 				fromAddress = settings.CAMPAIGN_FROM_ADDRESS.get(slug)
-				unsubscribe_link = "%s/%s/unsubscribe/%s" % (settings.CAMPAIGN_URL.get(slug), slug, email_on_queue.subscription.subscriber.id)
+				unsubscribe_link = "%s/%s/unsubscribe/%s/%s" % (settings.CAMPAIGN_URL.get(slug), slug, email_on_queue.subscription.subscriber.id,email_on_queue.subscription.subscriber.email_address)
 				overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(slug), reverse('campaigns:overview', args=(slug,)))
 				home_url = settings.CAMPAIGN_URL.get(slug)
 				logo_url = "%s/static/images/%s_email_logo.png" % (home_url, slug)

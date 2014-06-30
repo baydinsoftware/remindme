@@ -70,7 +70,7 @@ def campaign(request,campaign_slug):
 
 
 			#send email with appropriate shortcodes replaced
-			unsubscribe_link = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),reverse('campaigns:unsubscribe', args=(campaign.slug,subscriber.id,)))
+			unsubscribe_link = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),reverse('campaigns:unsubscribe', args=(campaign.slug,subscriber.id,subscriber.email_address)))
 			overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),reverse('campaigns:overview', args=(campaign.slug,)))
 			home_url = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),reverse('campaigns:campaign', args=(campaign.slug,)))
 			logo_url = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),staticfiles_storage.url("images/%s_email_logo.png" % campaign.slug))
@@ -230,7 +230,7 @@ def campaign(request,campaign_slug):
 					body = campaign.before_welcome_content
 				
 				#Send welcome email email with approrpaite information
-				unsubscribe_link = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),reverse('campaigns:unsubscribe', args=(campaign.slug,subscriber.id,)))
+				unsubscribe_link = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),reverse('campaigns:unsubscribe', args=(campaign.slug,subscriber.id,subscriber.email_address)))
 				overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),reverse('campaigns:overview', args=(campaign.slug,)))
 				home_url = settings.CAMPAIGN_URL.get(campaign.slug)
 				logo_url = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),staticfiles_storage.url("images/%s_email_logo.png" % campaign.slug))
@@ -292,7 +292,7 @@ def campaign(request,campaign_slug):
 			subscription = Subscription.objects.create(subscriber=subscriber,
 					subscription=option)
 
-		    unsubscribe_link = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),reverse('campaigns:unsubscribe', args=(campaign.slug,subscriber.id,)))
+		    unsubscribe_link = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),reverse('campaigns:unsubscribe', args=(campaign.slug,subscriber.id,subscriber.email_address)))
 		    overview_url =  "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),reverse('campaigns:overview', args=(campaign.slug,)))
 
 		    home_url = settings.CAMPAIGN_URL.get(campaign.slug)
@@ -438,10 +438,25 @@ def overview(request,campaign_slug):
 		'analytics':analytics,
 		})
 
-def unsubscribe(request,subscriber_id,campaign_slug):
-	subscriber = get_object_or_404(Subscriber,id=subscriber_id)
+def unsubscribe(request,subscriber_id,subscriber_email_address,campaign_slug):
+#	subscriber = get_object_or_404(Subscriber,id=subscriber_id)
 	campaign = get_object_or_404(Campaign,slug=campaign_slug)
-	subscriptions = Subscription.objects.filter(subscriber=subscriber)
+	try:
+		subscriber = Subscriber.objects.get(id=subscriber_id,email_address=subscriber_email_address)
+        	subscriptions = Subscription.objects.filter(subscriber=subscriber)
+		
+	except(ObjectDoesNotExist):
+		analytics = settings.ANALYTICS.get(campaign.slug)
+                message = """
+                <p class='centered'>
+                 Subscription not found.
+                </p>
+                """
+                return render(request, 'campaigns/unsubscribe_confirmation.html', {
+                          'campaign':campaign,
+                          'analytics':analytics,
+                          'message':message,
+                                })
 
 	if request.method == 'GET':
 		return render(request, 'campaigns/unsubscribe.html', {
@@ -466,6 +481,7 @@ def unsubscribe(request,subscriber_id,campaign_slug):
 		overview_url = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),reverse('campaigns:overview', args=(slug,)))
 		home_url = settings.CAMPAIGN_URL.get(campaign.slug)
 		logo_url = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),staticfiles_storage.url("images/%s_email_logo.png" % campaign.slug))
+		unsubscribe_link = "%s%s" % (settings.CAMPAIGN_URL.get(campaign.slug),reverse('campaigns:unsubscribe', args=(campaign.slug,subscriber.id,subscriber.email_address)))
 		fromName = campaign.name
 		fromAddress = settings.CAMPAIGN_FROM_ADDRESS.get(campaign.slug)
 		send(
@@ -480,18 +496,26 @@ def unsubscribe(request,subscriber_id,campaign_slug):
 					"{{HOME_URL}}":home_url,
 					"{{CAMPAIGN_NAME}}":campaign.name,
 					"{{LOGO_URL}}":logo_url,
-					"{{unsubscribe}}":"",
-
+					"{{unsubscribe}}":unsubscribe_link,
 					}
 			)
 			  
-		subscriber.delete()
 		analytics = settings.ANALYTICS.get(campaign.slug)
+		message = """
+		<p class='centered'>
+                 We're sad to see you go, %s    
+                </p>
+		<p class='centered'>
+                 Maybe we'll see you around.
+                </p>
+		""" % subscriber.name
+		subscriber.delete()
 		return render(request, 'campaigns/unsubscribe_confirmation.html', {
 			  'subscriber': subscriber,
 			  'campaign':campaign,
 			  'analytics':analytics,
-			  })
+			  'message':message,
+				})
 
 def send_test(request,email_id,email_address):
 	if not re.match(r"[^@]+@[^@]+\.[^@]+", email_address):

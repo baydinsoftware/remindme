@@ -26,12 +26,7 @@
 			<img src="{{ STATIC_URL}}images/{{ campaign.slug }}_logo.png" />
 		</a>
 	</div>
-	<p class='centered'>
-		We're sad to see you go, {{ subscriber.name }}
-	</p>
-	<p class='centered'>
-		Maybe we'll see you around.
-	</p>
+	{% autoescape off %}{{message}}{% endautoescape %}
 	<div id="footer">
 	Brought to you by the makers of <a href="http://www.boomeranggmail.com/">Boomerang for Gmail</a>, <a href="http://boomerangcalendar.com/">Boomerang Calendar</a>, <a href="http://inboxpause.com">Inbox Pause</a>, <a href="http://www.boomeranggmail.com/android/">Boomerang for Android</a> and <a href="http://www.baydin.com/boomerang/">Boomerang for Outlook</a>
 
