@@ -130,14 +130,17 @@ def campaign(request,campaign_slug):
 			  queue = EmailQueue.objects.create(send_date=send_date_utc,subscription=subscription,email=email)
 		    
 		    ###Display Thank you screen
+			analytics = settings.ANALYTICS.get(campaign.slug)
 			return render(request, 'campaigns/thanks.html', {
-			  'subscriber': subscriber,'campaign':campaign
+			  'subscriber': subscriber,'campaign':campaign,'analytics':analytics,
 			  })
 	    overview_url = reverse('campaigns:overview',args=(campaign.slug,))
 	    description_text = campaign.description.replace("{{overview_url}}",overview_url)
+	    analytics = settings.ANALYTICS.get(campaign.slug)
 	    return render(request, 'campaigns/subscribe.html', {
-		'form': form,'campaign':campaign,'description_text':description_text
-		  })
+		'form': form,'campaign':campaign,'description_text':description_text,
+		'analytics':analytics,
+		 })
 		
 	elif type == DEADLINE:
 		if request.method == 'GET':
@@ -254,15 +257,18 @@ def campaign(request,campaign_slug):
 					}
 				)
 
+				analytics = settings.ANALYTICS.get(campaign.slug)
 				return render(request, 'campaigns/thanks.html', {
-					'subscriber': subscriber,'campaign':campaign
+					'subscriber': subscriber,'campaign':campaign, 'analytics':analytics,
 				})	    
 		overview_url = reverse('campaigns:overview',args=(campaign.slug,))
 	#	overview_url = request.get_host()
 		description_text = campaign.description.replace("{{overview_url}}",overview_url)
+		analytics = settings.ANALYTICS.get(campaign.slug)
 		return render(request, 'campaigns/subscribe.html', {
-		'form': form,'campaign':campaign,'description_text':description_text
-		  })
+		'form': form,'campaign':campaign,'description_text':description_text,
+		'analytics':analytics,  
+		})
 	elif type == FIXED:
 	    if request.method == 'GET':
 		form = FixedForm(campaign=campaign)
@@ -318,16 +324,18 @@ def campaign(request,campaign_slug):
 					"{{four_days}}":fourdays.strftime("%A, %B %e"),
 					}
 			)
-			  
+		    analytics = settings.ANALYTICS.get(campaign.slug)
 		    return render(request, 'campaigns/thanks.html', {
-			  'subscriber': subscriber,'campaign':campaign
+			  'subscriber': subscriber,'campaign':campaign,'analytics':analytics,
 			  })	    
 	    overview_url = reverse('campaigns:overview',args=(campaign.slug,))
 	    description_text = campaign.description.replace("{{overview_url}}",overview_url)
-	    return render(request, 'campaigns/subscribe.html', {
-		'form': form,'campaign':campaign,'description_text':description_text
-		  })	    
-		  
+	    analytics = settings.ANALYTICS.get(campaign.slug)
+            return render(request, 'campaigns/subscribe.html', {
+                'form': form,'campaign':campaign,'description_text':description_text,
+                'analytics':analytics,
+                 })      
+	  
 		  
 	#string = "this is %s" % type
 	#return HttpResponse(string)
@@ -423,10 +431,11 @@ def overview(request,campaign_slug):
 				days = ""
 			send_date = "%s %s before deadline at %s" % (months, days, email.send_time.strftime("%I:%M %p"))
 			formatted_emails.append({'subject':subject,'send_date':send_date,'content':body})
-		
+	analytics = settings.ANALYTICS.get(campaign.slug)
 	return render(request, 'campaigns/overview.html', {
 		'campaign': campaign,
 		'emails':formatted_emails,
+		'analytics':analytics,
 		})
 
 def unsubscribe(request,subscriber_id,campaign_slug):
@@ -477,10 +486,11 @@ def unsubscribe(request,subscriber_id,campaign_slug):
 			)
 			  
 		subscriber.delete()
-
+		analytics = settings.ANALYTICS.get(campaign.slug)
 		return render(request, 'campaigns/unsubscribe_confirmation.html', {
 			  'subscriber': subscriber,
 			  'campaign':campaign,
+			  'analytics':analytics,
 			  })
 
 def send_test(request,email_id,email_address):
