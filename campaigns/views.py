@@ -89,7 +89,7 @@ def campaign(request,campaign_slug):
 					"{{HOME_URL}}":home_url,
 					"{{CAMPAIGN_NAME}}":campaign.name,
 					"{{LOGO_URL}}":logo_url,
-
+					"{{CAMPAIGN_SLUG}}":campaign.slug,
 					}
 			)
 		    
@@ -253,7 +253,7 @@ def campaign(request,campaign_slug):
 					"{{HOME_URL}}":home_url,
 					"{{CAMPAIGN_NAME}}":campaign.name,
 					"{{LOGO_URL}}":logo_url,
-
+					"{{CAMPAIGN_SLUG}}":campaign.slug,
 					}
 				)
 
@@ -322,6 +322,7 @@ def campaign(request,campaign_slug):
 					"{{year-}}":last_year,
 					"{{week+}}":week.strftime("%A, %B %e"),
 					"{{four_days}}":fourdays.strftime("%A, %B %e"),
+					"{{CAMPAIGN_SLUG}}":campaign.slug,
 					}
 			)
 		    analytics = settings.ANALYTICS.get(campaign.slug)
@@ -497,6 +498,7 @@ def unsubscribe(request,subscriber_id,subscriber_email_address,campaign_slug):
 					"{{CAMPAIGN_NAME}}":campaign.name,
 					"{{LOGO_URL}}":logo_url,
 					"{{unsubscribe}}":unsubscribe_link,
+					 "{{CAMPAIGN_SLUG}}":campaign.slug,
 					}
 			)
 			  
@@ -568,6 +570,7 @@ def send_test(request,email_id,email_address):
                                 "{{year-}}":last_year,
 				"{{week+}}":week.strftime("%A, %B %e"),
 				"{{four_days}}":fourdays.strftime("%A, %B %e"),
+				 "{{CAMPAIGN_SLUG}}":slug,
 				}
 			)
 			return render(request, 'campaigns/email.html', {
@@ -602,6 +605,7 @@ def send_test(request,email_id,email_address):
 				"{{HOME_URL}}":home_url,
 				"{{CAMPAIGN_NAME}}":email.option.campaign.name,
 				"{{LOGO_URL}}":logo_url,
+				 "{{CAMPAIGN_SLUG}}":slug,
 				}
 			)
 
@@ -651,6 +655,7 @@ def send_test_addons(request,email_id,email_address):
 			"{{HOME_URL}}":home_url,
 			"{{CAMPAIGN_NAME}}":email.option.campaign.name,
 			"{{LOGO_URL}}":logo_url,
+			 "{{CAMPAIGN_SLUG}}":slug,
 			}
 		)
 

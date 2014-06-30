@@ -53,6 +53,7 @@ class Command(NoArgsCommand):
 					"{{overview_url}}":overview_url,
 					"{{HOME_URL}}":settings.CAMPAIGN_URL.get(option.campaign.slug),
 					"{{CAMPAIGN_NAME}}":option.campaign.name,
+					"{{CAMPAIGN_SLUG}}":option.campaign.slug,
 					"{{LOGO_URL}}":logo_url,
 					"{{year}}":str(current_year),
 					"{{year+}}":next_year,
@@ -108,6 +109,7 @@ class Command(NoArgsCommand):
 					"{{overview_url}}":overview_url,
 					"{{HOME_URL}}":home_url,
 					"{{CAMPAIGN_NAME}}":campaign.name,
+					"{{CAMPAIGN_SLUG}}":campaign.slug,
 					"{{LOGO_URL}}":logo_url,
 					}
 				)
@@ -136,6 +138,7 @@ class Command(NoArgsCommand):
 					"{{overview_url}}":overview_url,
 					"{{HOME_URL}}":home_url,
 					"{{CAMPAIGN_NAME}}":email_on_queue.subscription.subscription.name,
+					"{{CAMPAIGN_SLUG}}":slug,
 					"{{LOGO_URL}}":logo_url,
 					}
 				)
