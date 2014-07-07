@@ -63,7 +63,7 @@ class DeadlineForm(ModelForm):
 			)
 		self.fields['deadline'].required = True
 		self.fields['deadline'].widget = SelectDateWidget()
-	
+		self.fields['name'].widget.attrs['autofocus'] = u'autofcous'
 	class Meta:
 		model = Subscriber
 		fields = ['name','email_address','confirm_email','deadline']
@@ -93,7 +93,7 @@ class FixedForm(ModelForm):
                   			fields=('description',),
                   			)
                         )
-        
+ 		self.fields['name'].widget.attrs['autofocus'] = u'autofcous'       
         class Meta:
                 model = Subscriber
                 fields = ['name','email_address','confirm_email']

@@ -137,9 +137,11 @@ def campaign(request,campaign_slug):
 	    overview_url = reverse('campaigns:overview',args=(campaign.slug,))
 	    description_text = campaign.description.replace("{{overview_url}}",overview_url)
 	    analytics = settings.ANALYTICS.get(campaign.slug)
+	    title = settings.CAMPAIGN_TITLE_LANDING.get(campaign.slug)
+	    meta = settings.CAMPAIGN_LANDING_META.get(campaign.slug)
 	    return render(request, 'campaigns/subscribe.html', {
 		'form': form,'campaign':campaign,'description_text':description_text,
-		'analytics':analytics,
+		'analytics':analytics,'title':title,'meta':meta,
 		 })
 		
 	elif type == DEADLINE:
@@ -264,10 +266,12 @@ def campaign(request,campaign_slug):
 		overview_url = reverse('campaigns:overview',args=(campaign.slug,))
 	#	overview_url = request.get_host()
 		description_text = campaign.description.replace("{{overview_url}}",overview_url)
-		analytics = settings.ANALYTICS.get(campaign.slug)
+		analytics = settings.ANALYTICS.get(campaign.slug),
+		title = settings.CAMPAIGN_TITLE_LANDING.get(campaign.slug)
+		meta = settings.CAMPAIGN_LANDING_META.get(campaign.slug)
 		return render(request, 'campaigns/subscribe.html', {
 		'form': form,'campaign':campaign,'description_text':description_text,
-		'analytics':analytics,  
+		'analytics':analytics, 'title':title,'meta':meta
 		})
 	elif type == FIXED:
 	    if request.method == 'GET':
@@ -332,9 +336,11 @@ def campaign(request,campaign_slug):
 	    overview_url = reverse('campaigns:overview',args=(campaign.slug,))
 	    description_text = campaign.description.replace("{{overview_url}}",overview_url)
 	    analytics = settings.ANALYTICS.get(campaign.slug)
+	    title = settings.CAMPAIGN_TITLE_LANDING.get(campaign.slug)
+	    meta = settings.CAMPAIGN_LANDING_META.get(campaign.slug)
             return render(request, 'campaigns/subscribe.html', {
                 'form': form,'campaign':campaign,'description_text':description_text,
-                'analytics':analytics,
+                'analytics':analytics,'title':title,'meta':meta
                  })      
 	  
 		  
@@ -433,10 +439,12 @@ def overview(request,campaign_slug):
 			send_date = "%s %s before deadline at %s" % (months, days, email.send_time.strftime("%I:%M %p"))
 			formatted_emails.append({'subject':subject,'send_date':send_date,'content':body})
 	analytics = settings.ANALYTICS.get(campaign.slug)
+	title = settings.CAMPAIGN_TITLE_OVERVIEW.get(campaign.slug)
+	meta = settings.CAMPAIGN_OVERVIEW_META.get(campaign.slug)
 	return render(request, 'campaigns/overview.html', {
 		'campaign': campaign,
 		'emails':formatted_emails,
-		'analytics':analytics,
+		'analytics':analytics,'title':title,'meta':meta,
 		})
 
 def unsubscribe(request,subscriber_id,subscriber_email_address,campaign_slug):
