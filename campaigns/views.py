@@ -266,7 +266,7 @@ def campaign(request,campaign_slug):
 		overview_url = reverse('campaigns:overview',args=(campaign.slug,))
 	#	overview_url = request.get_host()
 		description_text = campaign.description.replace("{{overview_url}}",overview_url)
-		analytics = settings.ANALYTICS.get(campaign.slug),
+		analytics = settings.ANALYTICS.get(campaign.slug)
 		title = settings.CAMPAIGN_TITLE_LANDING.get(campaign.slug)
 		meta = settings.CAMPAIGN_LANDING_META.get(campaign.slug)
 		return render(request, 'campaigns/subscribe.html', {
