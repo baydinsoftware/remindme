@@ -260,9 +260,10 @@ def campaign(request,campaign_slug):
 				)
 
 				analytics = settings.ANALYTICS.get(campaign.slug)
+				download_calendar = True
 				return render(request, 'campaigns/thanks.html', {
-					'subscriber': subscriber,'campaign':campaign, 'analytics':analytics,
-				})	    
+					'subscriber': subscriber,'campaign':campaign, 'analytics':analytics,'download_calendar':download_calendar
+				})
 		overview_url = reverse('campaigns:overview',args=(campaign.slug,))
 	#	overview_url = request.get_host()
 		description_text = campaign.description.replace("{{overview_url}}",overview_url)
@@ -674,4 +675,37 @@ def send_test_addons(request,email_id,email_address):
 			  'email_address':email_address,
 			  })
 
+def download(request):
+
+	slug = request.POST['slug']
+	subscriber_id = request.POST['subscriber_id']
+	subscriber = get_object_or_404(Subscriber,id=subscriber_id)
+	campaign = get_object_or_404(Campaign,slug=slug)
+
+	trail = ""
+	subscriptions = Subscription.objects.filter(subscriber=subscriber)
+
+	for subscription in subscriptions:
+		events = EmailQueue.objects.filter(subscription=subscription)
+		for event in events:
+			time = event.send_date
+			description = "Look out for an email or visit %s for more info on this reminder." % (settings.CAMPAIGN_URL.get(slug))
+			trail = """%s
+BEGIN:VEVENT
+SUMMARY:%s
+UID:%s-%s
+DESCRIPTION:%s
+DTSTART;TZID=UTC:%s
+DTEND;TZID=UTC:%s
+END:VEVENT""" % (trail,event.email.subject,settings.CAMPAIGN_FROM_ADDRESS.get(slug),event.id,description,time.strftime('%Y%m%dT%H%M%S'),time.strftime('%Y%m%dT%H%M%S'))
+
+	response = HttpResponse(content_type='text')
+	response['Content-Disposition'] = 'attachment; filename="%s_reminders_calendar.ics"' % slug
+	response.write("""BEGIN:VCALENDAR
+METHOD:PUBLISH
+VERSION:2.0
+PRODID:-//Baydin//%s//EN%s
+END:VCALENDAR""" % (campaign.name,trail))
+
+	return response
 

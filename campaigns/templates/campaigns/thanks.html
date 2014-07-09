@@ -16,9 +16,28 @@
 	</div>
 	<p class='centered'>
 		Thanks for subscribing to {{ campaign.name }}, {{ subscriber.name }}
-		<br /><br />
+	</p>
+	<p class='centered'>
 		We've just sent you a confirmation email!
 	</p>
+	{% if download_calendar %}
+	<div id="form">
+		<p>
+			Email reminders not enough? 
+		</p>
+		<p>
+			Upload these reminders to your <a target="_blank" href="https://support.google.com/calendar/answer/37118?hl=en">Google Calendar</a>, <a target="_blank" href="http://email.about.com/od/googlecalendartips/qt/How-To-Import-Ics-Calendar-Files-In-Ical.htm">iCal</a>, <a target="_blank" href="http://office.microsoft.com/en-us/mac-outlook-help/import-ical-or-address-book-items-into-outlook-HA102928319.aspx">Outlook</a> or other compatable calendar!
+		</p>
+		<p>
+			Click below to download these reminders as an ics file.
+		</p>
+		<form method="post" action ="{% url 'campaigns:download' %}">{% csrf_token %}
+			<input type="hidden" name="slug" value="{{campaign.slug}}">
+			<input type="hidden" name="subscriber_id" value="{{subscriber.id}}">
+			<input type="submit" class = "download" value="Download">
+		</form>
+	</div>
+	{% endif %}
 	{% include "campaigns/footer.html" %}
 
 </body>
